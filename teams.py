@@ -1,15 +1,13 @@
+from bs4 import BeautifulSoup
+import requests
+from constants import HEADERS
+
 MLB = []
 NBA = []
 NFL = []
 
-from bs4 import BeautifulSoup
-import requests
-
-USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100101 Firefox/65.0"
-headers = {"user-agent": USER_AGENT}
-
 URL = "https://www.baseball-reference.com/teams"
-resp = requests.get(URL, headers=headers)
+resp = requests.get(URL, headers=HEADERS)
 if resp.status_code == 200:
     soup = BeautifulSoup(resp.content, "html.parser")
     results = soup.find_all('td', {'class': 'left', 'data-stat': 'franchise_name'})
@@ -18,10 +16,12 @@ if resp.status_code == 200:
 
 def name_changes(name):
     if name == 'TBD':
-        return 'TBR'
+        return ('TBR',)
+    elif name == 'ANA':
+        return ('LAA', 'CAL')
     elif name == 'FLA':
-        return 'MIA'
+        return ('MIA',)
     elif name == 'WSN':
-        return 'MON'
+        return ('MON',)
     else:
         return name

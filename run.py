@@ -1,24 +1,19 @@
 from bs4 import BeautifulSoup
-import random
-import requests
-
-TEAMS = ['ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW', 'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR', 'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM', 'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SFG', 'SEA', 'STL', 'TBR', 'TEX', 'TOR', 'WSN']
+import random, requests, pprint
+from teams import MLB, name_changes
+import sys
+pp = pprint.PrettyPrinter(indent=4)
+TEAMS = MLB
 side_length = int(input("Enter the number of teams you want on one side of the square: "))
 teams = random.sample(TEAMS, side_length * 2)
 game_state = {}
 score = 0
 bad_input = False
+DEBUG = len(sys.argv) > 1 and sys.argv[1].lower() == 'debug'
 for i in range(side_length):
     for j in range(side_length, len(teams)):
         game_state[(teams[i], teams[j])] = ''
-print(game_state)
-def name_changes(name):
-    if name == 'TBR':
-        return 'TBD'
-    elif name == 'WSN':
-        return 'MON'
-    else:
-        return name
+pp.pprint(game_state)
 
 def bbref_id(name, number):
     name_lst = [n.strip() for n in name.split(' ')]
@@ -31,7 +26,7 @@ def check_teams(player):
     for pair in game_state:
         team_1_check = pair[0] or name_changes(pair[0])
         team_2_check = pair[1] or name_changes(pair[1])
-        if team_1_check in player_teams and team_2_check in player_teams:
+        if team_1_check in player_teams and team_2_check in player_teams and len(game_state[pair]) == 0:
             game_state[pair] = player['name']
             return True
     return False
@@ -40,7 +35,7 @@ USER_AGENT = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.14; rv:65.0) Gecko/20100
 headers = {"user-agent": USER_AGENT}
 
 while score < len(game_state):
-    name_input = input("Please enter the name of a player: ")
+    name_input = input("Please enter the name of a player: ").lower()
     count = 1
     search_results = []
     first = True
@@ -78,6 +73,7 @@ while score < len(game_state):
                 'years': (start_year, end_year), 
                 'teams': teams
             }
+            if DEBUG: print(player_profile)
             search_results.append(player_profile)
             count += 1
     if not bad_input:
@@ -95,4 +91,4 @@ while score < len(game_state):
                 score += 1
     else:
         print('Bad input :(')
-    print(game_state)
+    pp.pprint(game_state)

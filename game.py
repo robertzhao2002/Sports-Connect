@@ -1,14 +1,13 @@
-from bs4 import BeautifulSoup
-import random, requests, pprint
-from teams import MLB, name_changes
-from constants import HEADERS, DEBUG
-from search import bbref_id
+import random, pprint
+from teams import TEAM_CODES, name_changes
+from search import search_player, suggest_single_solution, possible_solution
 
 pp = pprint.PrettyPrinter(indent=4)
-TEAMS = MLB
+TEAMS = TEAM_CODES
 side_length = int(input("Enter the number of teams you want on one side of the square: "))
 teams = random.sample(TEAMS, side_length * 2)
 game_state = {}
+solution = None
 score = 0
 bad_input = False
 
@@ -16,7 +15,7 @@ for i in range(side_length):
     for j in range(side_length, len(teams)):
         game_state[(teams[i], teams[j])] = ''
 
-# game_state  = {('FLA', 'ATL'): ''}
+# game_state  = {('PHI', 'TOR'): ''}
 pp.pprint(game_state)
 
 def check_teams(player):
@@ -34,49 +33,28 @@ def check_teams(player):
             return True
     return False
 
+def special_inputs(input_string):
+    if input_string == 'help':
+        for t,p in game_state.items():
+            if len(p) == 0:
+                print(t, suggest_single_solution(team_pair=t, in_game=True))
+                break
+    if input_string == 'solve':
+        solution = possible_solution(game_state)
+        pp.pprint(solution)
+    return input_string
+
 while score < len(game_state):
     name_input = input("Please enter the name of a player: ").lower()
+    special_input = special_inputs(input_string=name_input)
+    if special_input == 'help': 
+        continue
+    elif special_input == 'solve': 
+        game_state = solution
+        break
     count = 1
-    search_results = []
-    first = True
-    while True:
-        name = bbref_id(name_input, count)
-        URL = "https://www.baseball-reference.com/players/{}/{}.shtml".format(name[0], name[1])
-        resp = requests.get(URL, headers=HEADERS)
-        if resp.status_code != 200:
-            bad_input = first
-            break
-        else:
-            first = False
-            bad_input = False
-            soup = BeautifulSoup(resp.content, "html.parser")
-            results = soup.find_all('table', {'id': 'batting_standard'})
-            if len(results) == 0:
-                results = soup.find_all('table', {'id': 'pitching_standard'})[0].find_all('tbody')[0].findAll('tr', {'class': ['full', 'partial_table']})
-            else:
-                results = results[0].find_all('tbody')[0].findAll('tr', {'class': ['full', 'partial_table']})
-            player_name = soup.find_all('h1')[0].text.strip()
-            teams = set()
-            for r in results:
-                t_result = r.findAll('td', {'data-stat': 'team_ID'})
-                team_name = t_result[0].text if len(t_result) > 0 else 'TOT'
-                if team_name != 'TOT' and team_name.strip() != '':
-                    teams.add(team_name)
-            start_year = results[0].get('id')[-4:]
-            end_year = 2022
-            if results[-1]['class'][0] == 'partial_table':
-                end_year = results[-1].find_all('th')[0].text
-            else:
-                end_year = results[-1].get('id')[-4:]
-            player_profile = {
-                'name': player_name,
-                'years': (start_year, end_year), 
-                'teams': teams
-            }
-            if DEBUG: print(player_profile)
-            search_results.append(player_profile)
-            count += 1
-    if not bad_input:
+    search_results = search_player(name_input)
+    if search_results is not None:
         if len(search_results) > 1:
             for i, s in enumerate(search_results):
                 year_range = '{}-{}'.format(s['years'][0], s['years'][1]) 

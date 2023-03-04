@@ -35,7 +35,7 @@ def search_player(name_input):
                     results = results[0].find_all('tbody')[0].findAll(season_tag, season_classes)
             elif BASKETBALL:
                 results = soup.find_all('table', {'id': 'per_game'})
-                print(results)
+                # print(results)
                 if len(results) == 0:
                     count += 1
                     continue

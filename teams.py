@@ -11,6 +11,12 @@ def name_changes(name):
         return ('MIA',)
     elif name == 'WSN':
         return ('MON',)
+    elif name == 'OKC':
+        return ('SEA',)
+    elif name == 'NOH':
+        return ('NOP',)
+    elif name == 'CHA':
+        return ('CHO', 'CHH')
     elif name == 'NJN':
         return ('BRK',)
     else:
@@ -24,9 +30,9 @@ def get_query_fields(mode):
 
 TEAM_CODES = []
 URL = "https://www.{}-reference.com/teams".format(MODE)
-print(URL)
+# print(URL)
 resp = requests.get(URL, headers=HEADERS)
-print(resp)
+# print(resp)
 if resp.status_code == 200:
     soup = BeautifulSoup(resp.content, "html.parser")
     args = get_query_fields(MODE)
@@ -37,5 +43,5 @@ if resp.status_code == 200:
     for r in results:
         TEAM_CODES.append(r.find_all('a')[0].get('href')[-4:-1])
 
-print(TEAM_CODES)
+# print(TEAM_CODES)
 

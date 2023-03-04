@@ -34,7 +34,13 @@ def search_player(name_input):
                 else:
                     results = results[0].find_all('tbody')[0].findAll(season_tag, season_classes)
             elif BASKETBALL:
-                results = soup.find_all('table', {'id': 'per_game'})[0].find_all('tbody')[0].findAll(season_tag, season_classes)
+                results = soup.find_all('table', {'id': 'per_game'})
+                print(results)
+                if len(results) == 0:
+                    count += 1
+                    continue
+                else:
+                    results = results[0].find_all('tbody')[0].findAll(season_tag, season_classes)
             player_name = soup.find_all('h1')[0].text.strip()
             teams = set()
             for r in results:

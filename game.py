@@ -15,7 +15,7 @@ for i in range(side_length):
     for j in range(side_length, len(teams)):
         game_state[(teams[i], teams[j])] = ''
 
-# game_state  = {('PHI', 'TOR'): ''}
+# game_state  = {('CLE', 'LAL'): ''}
 pp.pprint(game_state)
 
 def check_teams(player):

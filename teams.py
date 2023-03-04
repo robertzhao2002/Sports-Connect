@@ -36,5 +36,5 @@ if resp.status_code == 200:
     for r in results:
         TEAM_CODES.append(r.find_all('a')[0].get('href')[-4:-1])
 
-print(TEAM_CODES)
+# print(TEAM_CODES)
 

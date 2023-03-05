@@ -1,11 +1,12 @@
 import logo from './logo.svg';
 import styles from './App.module.css';
-import searchPlayer from './search';
+// import { promises as fs } from 'fs';
+import { searchPlayer } from './search.js';
 
 
 function App() {
   // console.log("FFF");
-  console.log(searchPlayer('charlie morton'));
+  searchPlayer('charlie morton');
   return (
     <div class={styles.App}>
       <header class={styles.header}>

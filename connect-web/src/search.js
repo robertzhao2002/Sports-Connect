@@ -11,11 +11,11 @@ export async function searchPlayer(name) {
     var count = 1;
     var first = true;
     var badInput = false;
-    var searchResults = 80;
-    // while (true) {
+    var searchResults = [];
+    // while (true && count <= 15) {
     try {
         const [firstLetter, nameID] = bbRefId(name, count);
-        const url = `https://www.baseball-reference.com/players/${firstLetter}/${nameID}.html`;
+        const url = `https://www.baseball-reference.com/players/${firstLetter}/${nameID}.shtml`;
         console.log(url);
         const response = await fetch(url, { 'mode': 'cors' });
         console.log(response.status);
@@ -26,25 +26,36 @@ export async function searchPlayer(name) {
             first = false;
             badInput = false;
             const body = await response.text();
-            console.log('E');
             const $ = cheerio.load(body);
+            var start = Number.MAX_SAFE_INTEGER;
+            var end = Number.MIN_SAFE_INTEGER;
             const teams = new Set();
-            var searchFields = $('#pitching_standard > tbody > .full');
+            const playerName = $('h1').text();
+            console.log(playerName);
+            var searchFields = $('#pitching_standard > tbody > .full, .partial_table');
             if ($('#pitching_standard > tbody > .full').length == 0) {
-                searchFields = $('#batting_standard > tbody > .full')
+                searchFields = $('#batting_standard > tbody > .full, .partial_table')
             }
             searchFields.map((id, element) => {
-                const year = $(element).find('[data-stat=year_ID]').text();
-                console.log(year);
+                const year = parseInt($(element).find('[data-stat=year_ID]').text());
+                if (year >= end) end = year;
+                if (year <= start) start = year;
                 const team = $(element).find('[data-stat=team_ID]').text();
-                teams.add(team);
+                console.log(team);
+                if (team != 'TOT' && team.trim() != '') teams.add(team);
             });
             count++;
+            searchResults.push({
+                name: playerName,
+                years: { start: start, end: end },
+                teams: teams
+            });
         }
     } catch (error) {
         console.log(error);
     }
     // }
+
     if (badInput) return null;
     return searchResults;
 }

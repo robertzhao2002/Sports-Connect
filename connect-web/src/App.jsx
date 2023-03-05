@@ -6,7 +6,7 @@ import { searchPlayer } from './search.js';
 
 function App() {
   // console.log("FFF");
-  searchPlayer('charlie morton');
+  console.log(searchPlayer('raisel iglesias'));
   return (
     <div class={styles.App}>
       <header class={styles.header}>

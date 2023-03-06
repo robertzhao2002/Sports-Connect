@@ -1,4 +1,3 @@
-import logo from './logo.svg';
 import styles from './App.module.css';
 import { searchPlayer, singleSolution } from './game/search.js';
 import { checkPlayerTeams, createGame, randomTeams } from './game/teams.js';
@@ -84,7 +83,8 @@ function App() {
 
   console.log(gridSignal());
   return (
-    <div>
+    <div align="center">
+      <h1>Connect the teams by naming a player that played for both teams!</h1>
       <table>
         <tbody>
           <For each={gridSignal()}>{teams =>
@@ -114,8 +114,13 @@ function App() {
         />
         <button type="submit">Check</button>
       </form>
-      <button onClick={() => console.log("F")}>Solve</button>
+
+      <br></br>
       <button onClick={hint}>Hint</button>
+
+      <br></br>
+      <button onClick={() => console.log("F")}>Solve</button>
+
       <table>
         <tbody>
           <Show
@@ -124,7 +129,7 @@ function App() {
             <For each={searchResult()}>{item =>
               <tr>
                 <td><img height="100" width="100" src={item.imageUrl} /></td>
-                <td>{item.name}: {item.years.start}-{item.years.end}</td>
+                <td>{item.name}: {item.years.start} to {item.years.end}</td>
                 <td><button onClick={() => { checkResult(item); setSearchResult([]); }}>Select</button></td>
               </tr>
             }
@@ -133,7 +138,7 @@ function App() {
         </tbody>
 
       </table>
-      <h2>Past Guesses</h2>
+      <h1>Past Guesses</h1>
       <table>
         <tbody>
           <For each={pastGuesses()}>{item =>

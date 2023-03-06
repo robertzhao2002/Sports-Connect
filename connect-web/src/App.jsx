@@ -6,6 +6,7 @@ import { batch, createSignal, Show } from "solid-js";
 
 function App() {
   const length = 3;
+  const maxScore = length * length;
   const teams = randomTeams(length * 2);
   const board = createGame(teams);
   const showGrid = new Array(length + 1);
@@ -16,6 +17,7 @@ function App() {
   const [inputField, setInputField] = createSignal("");
   const [player, setPlayer] = createSignal("");
   const [gridSignal, setGridSignal] = createSignal(showGrid);
+  const [score, setScore] = createSignal(0);
   const submit = (event) => {
     event.preventDefault();
     batch(() => {
@@ -28,7 +30,7 @@ function App() {
 
         } else {
           console.log(result[0].teams);
-          Object.entries(board).forEach((e) => {
+          for (const e of Object.entries(board)) {
             const [teams, answer] = e;
             console.log(answer);
             if (checkPlayerTeams(teams.split(','), result[0].teams) && answer.player == null) {
@@ -45,8 +47,11 @@ function App() {
               setGridSignal(newGrid);
               console.log("Correct");
               console.log(board);
+              setScore(score() + 1);
+              if (score() == maxScore) alert("You Win!");
+              break;
             }
-          });
+          };
         }
       });
       setInputField("");
@@ -56,16 +61,15 @@ function App() {
   const hint = (event) => {
     event.preventDefault();
     batch(() => {
-      Object.entries(board).forEach((e) => {
+      for (const e of Object.entries(board)) {
         const [teams, answer] = e;
         if (answer.player == null) {
           singleSolution(teams.split(','), false, true).then(function (result) {
-            console.log(result);
+            alert(result);
           });
-          return;
+          break;
         }
-      });
-
+      };
     });
   }
   console.log(gridSignal());

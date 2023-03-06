@@ -26,8 +26,7 @@ function App() {
       const [teams, answer] = e;
       console.log(answer);
       if (checkPlayerTeams(teams.split(','), item.teams) && answer.player == null) {
-        const newResult = [...pastGuesses()];
-        newResult.push(item);
+        const newResult = [item, ...pastGuesses()];
         setPastGuesses(newResult);
         const [row, col] = answer.coordinates;
         console.log(answer);
@@ -117,35 +116,53 @@ function App() {
       </form>
       <button onClick={() => console.log("F")}>Solve</button>
       <button onClick={hint}>Hint</button>
-      <ul>
-        <Show
-          when={searchResult().length >= 2}
-        >
-          <For each={searchResult()}>{item =>
-            <li>
-              <img src={item.imageUrl} />{item.name}: {item.years.start}-{item.years.end}
-              <button onClick={() => { checkResult(item); setSearchResult([]); }}>Select</button>
-            </li>
+      <table>
+        <tbody>
+          <Show
+            when={searchResult().length >= 2}
+          >
+            <For each={searchResult()}>{item =>
+              <tr>
+                <td><img height="100" width="100" src={item.imageUrl} /></td>
+                <td>{item.name}: {item.years.start}-{item.years.end}</td>
+                <td><button onClick={() => { checkResult(item); setSearchResult([]); }}>Select</button></td>
+              </tr>
+            }
+            </For>
+          </Show>
+        </tbody>
+
+      </table>
+      <h2>Past Guesses</h2>
+      <table>
+        <tbody>
+          <For each={pastGuesses()}>{item =>
+            <tr>
+              <td><img height="100" width="100" src={item.imageUrl} /></td>
+              <td><p>{item.name}: {item.years.start}-{item.years.end}</p></td>
+              <td>
+                <ul>
+                  <For each={Object.entries(item.teams)}>{ty =>
+                    <li>{ty[0]}:
+                      <For each={ty[1]}>{yr =>
+                        <Show
+                          when={yr.end - yr.start > 0}
+                          fallback={<span> ({yr.start})</span>}>
+                          <span> ({yr.start} to {yr.end})</span>
+                        </Show>
+                      }</For>
+                    </li>
+                  }
+                  </For>
+                </ul>
+              </td>
+            </tr>
           }
           </For>
-        </Show>
-      </ul>
-      <h2>Past Guesses</h2>
-      <ul>
-        <For each={pastGuesses()}>{item =>
-          <li>
-            <img src={item.imageUrl} />{item.name}: {item.years.start}-{item.years.end}
-            <ul>
-              <For each={item.teams}>{team =>
-                <li>{team}</li>
-              }
-              </For>
-            </ul>
-          </li>
-        }
-        </For>
-      </ul>
-    </div>
+        </tbody>
+
+      </table>
+    </div >
   );
 }
 export default App;

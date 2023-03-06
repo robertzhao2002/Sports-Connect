@@ -13,12 +13,12 @@ export async function searchPlayer(name) {
     var badInput = false;
     var searchResults = [];
     while (true && count <= 15) {
-        try {
+        try { //
             const [firstLetter, nameID] = bbRefId(name, count);
             const url = `https://cors-anywhere.herokuapp.com/https://www.baseball-reference.com/players/${firstLetter}/${nameID}.shtml`;
             // console.log(url);
             const response = await fetch(url);
-            // console.log(response.status);
+            console.log(response.status);
             if (response.status != 200) {
                 badInput = first;
                 break;
@@ -29,7 +29,10 @@ export async function searchPlayer(name) {
                 const $ = cheerio.load(body);
                 var start = Number.MAX_SAFE_INTEGER;
                 var end = Number.MIN_SAFE_INTEGER;
-                const teams = new Set();
+                var startTeam = 0;
+                var endTeam = 0;
+                var prevTeam = null;
+                const teams = {};
                 const playerName = $('h1').text().trim();
                 const playerImgUrl = $('.media-item > img').attr('src');
                 var searchFields = $('#pitching_standard > tbody > .full, .partial_table');
@@ -41,9 +44,25 @@ export async function searchPlayer(name) {
                     if (year >= end) end = year;
                     if (year <= start) start = year;
                     const team = $(element).find('[data-stat=team_ID]').text().trim();
-                    if (team != 'TOT' && team.trim() != '') teams.add(team);
+                    if (team != prevTeam && team != 'TOT' && team.trim() != '') {
+                        startTeam = year;
+                        endTeam = year;
+                        if (team in teams) {
+                            const a = { start: startTeam, end: endTeam };
+                            teams[team].push(a);
+                        }
+                        else {
+                            teams[team] = [{ start: startTeam, end: endTeam }];
+                        }
+                    }
+                    if (team != 'TOT' && team.trim() != '') {
+                        const stints = teams[team].length;
+                        teams[team][stints - 1].end = year;
+                    }
+                    if (team != 'TOT') prevTeam = team;
                 });
                 count++;
+                console.log(teams);
                 searchResults.push({
                     name: playerName,
                     imageUrl: playerImgUrl,
@@ -103,8 +122,10 @@ export async function possibleSolution(teams) {
     return solution;
 }
 
-// searchPlayer('chris young').then(function (result) {
-//     console.log(result);
+// searchPlayer('barry zito').then(function (result) {
+//     console.log(result[0].teams['OAK'].forEach(a => {
+//         console.log(a);
+//     }));
 // });
 // console.log(searchPlayer('charlie morton'));
 // singleSolution(['PHI', 'TOR'], true);

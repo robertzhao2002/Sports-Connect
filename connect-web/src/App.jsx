@@ -18,40 +18,46 @@ function App() {
   const [player, setPlayer] = createSignal("");
   const [gridSignal, setGridSignal] = createSignal(showGrid);
   const [score, setScore] = createSignal(0);
+  const [searchResult, setSearchResult] = createSignal([]);
+
+  const checkResult = function (item) {
+    for (const e of Object.entries(board)) {
+      const [teams, answer] = e;
+      console.log(answer);
+      if (checkPlayerTeams(teams.split(','), item.teams) && answer.player == null) {
+        const [row, col] = answer.coordinates;
+        console.log(answer);
+        board[teams].player = item.name
+        showGrid[row + 1][col + 1] = item.imageUrl;
+        const newGrid = new Array(length + 1);
+        for (var i = 0; i < showGrid.length; i++) {
+          newGrid[i] = [];
+          for (var j = 0; j < showGrid.length; j++)
+            newGrid[i][j] = showGrid[i][j];
+        }
+        setGridSignal(newGrid);
+        console.log("Correct");
+        console.log(board);
+        setScore(score() + 1);
+        if (score() == maxScore) alert("You Win!");
+        break;
+      }
+    }
+  }
+
   const submit = (event) => {
     event.preventDefault();
     batch(() => {
       setPlayer(inputField());
       console.log(player());
-      searchPlayer(player()).then(function (result) {
+      searchPlayer(player().toLowerCase()).then(function (result) {
         if (result == null) {
           alert("bad input");
         } else if (result.length > 1) {
-
+          setSearchResult(result);
         } else {
           console.log(result[0].teams);
-          for (const e of Object.entries(board)) {
-            const [teams, answer] = e;
-            console.log(answer);
-            if (checkPlayerTeams(teams.split(','), result[0].teams) && answer.player == null) {
-              const [row, col] = answer.coordinates;
-              console.log(answer);
-              board[teams].player = result[0].name
-              showGrid[row + 1][col + 1] = result[0].imageUrl;
-              const newGrid = new Array(length + 1);
-              for (var i = 0; i < showGrid.length; i++) {
-                newGrid[i] = [];
-                for (var j = 0; j < showGrid.length; j++)
-                  newGrid[i][j] = showGrid[i][j];
-              }
-              setGridSignal(newGrid);
-              console.log("Correct");
-              console.log(board);
-              setScore(score() + 1);
-              if (score() == maxScore) alert("You Win!");
-              break;
-            }
-          };
+          checkResult(result);
         }
       });
       setInputField("");
@@ -72,6 +78,7 @@ function App() {
       };
     });
   }
+
   console.log(gridSignal());
   return (
     <div>
@@ -106,6 +113,16 @@ function App() {
       </form>
       <button onClick={() => console.log("F")}>Solve</button>
       <button onClick={hint}>Hint</button>
+      <ul>
+        <Show
+          when={searchResult().length >= 2}
+        >
+          <For each={searchResult()}>{item =>
+            <li><img src={item.imageUrl} onClick={() => { checkResult(item); }}
+            />{item.name}: {item.years.start}-{item.years.end}</li>
+          }</For>
+        </Show>
+      </ul>
     </div>
   );
 }

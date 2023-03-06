@@ -4,7 +4,7 @@ import { checkPlayerTeams, createGame, randomTeams } from './game/teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
 function App() {
-  const length = 3;
+  const length = 2;
   const maxScore = length * length;
   const teams = randomTeams(length * 2);
   const board = createGame(teams);
@@ -81,6 +81,13 @@ function App() {
     });
   }
 
+  const restart = (event) => {
+    event.preventDefault();
+    batch(() => {
+      console.log("restarting...");
+    });
+  }
+
   console.log(gridSignal());
   return (
     <div align="center">
@@ -96,7 +103,7 @@ function App() {
                 <Show
                   when={item.length > 3}
                   fallback={
-                    <td><img src={`/team-logos/${item}.png`} width="125px" height="125px" /></td>
+                    <td><img src={`/team-logos/mlb/${item}.png`} width="125px" height="125px" /></td>
                   }>
                   <td><img src={item} width="125px" height="125px" /></td>
                 </Show>
@@ -114,6 +121,9 @@ function App() {
         />
         <button type="submit">Check</button>
       </form>
+
+      <br></br>
+      <button onClick={restart}>Restart</button>
 
       <br></br>
       <button onClick={hint}>Hint</button>
@@ -136,7 +146,6 @@ function App() {
             </For>
           </Show>
         </tbody>
-
       </table>
       <h1>Past Guesses</h1>
       <table>

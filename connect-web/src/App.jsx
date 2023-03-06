@@ -136,6 +136,7 @@ function App() {
           <Show
             when={searchResult().length >= 2}
           >
+            <h1>Which One?</h1>
             <For each={searchResult()}>{item =>
               <tr>
                 <td><img height="100" width="100" src={item.imageUrl} /></td>

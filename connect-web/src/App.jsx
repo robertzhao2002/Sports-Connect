@@ -22,12 +22,12 @@ function App() {
   const [pastGuesses, setPastGuesses] = createSignal([]);
 
   const checkResult = function (item) {
+    const newResult = [item, ...pastGuesses()];
+    setPastGuesses(newResult);
     for (const e of Object.entries(board)) {
       const [teams, answer] = e;
       console.log(answer);
       if (checkPlayerTeams(teams.split(','), item.teams) && answer.player == null) {
-        const newResult = [item, ...pastGuesses()];
-        setPastGuesses(newResult);
         const [row, col] = answer.coordinates;
         console.log(answer);
         board[teams].player = item.name

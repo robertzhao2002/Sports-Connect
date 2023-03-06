@@ -19,12 +19,16 @@ function App() {
   const [gridSignal, setGridSignal] = createSignal(showGrid);
   const [score, setScore] = createSignal(0);
   const [searchResult, setSearchResult] = createSignal([]);
+  const [pastGuesses, setPastGuesses] = createSignal([]);
 
   const checkResult = function (item) {
     for (const e of Object.entries(board)) {
       const [teams, answer] = e;
       console.log(answer);
       if (checkPlayerTeams(teams.split(','), item.teams) && answer.player == null) {
+        const newResult = [...pastGuesses()];
+        newResult.push(item);
+        setPastGuesses(newResult);
         const [row, col] = answer.coordinates;
         console.log(answer);
         board[teams].player = item.name
@@ -122,8 +126,24 @@ function App() {
               <img src={item.imageUrl} />{item.name}: {item.years.start}-{item.years.end}
               <button onClick={() => { checkResult(item); }}>Select</button>
             </li>
-          }</For>
+          }
+          </For>
         </Show>
+      </ul>
+      <h2>Past Guesses</h2>
+      <ul>
+        <For each={pastGuesses()}>{item =>
+          <li>
+            <img src={item.imageUrl} />{item.name}: {item.years.start}-{item.years.end}
+            <ul>
+              <For each={item.teams}>{team =>
+                <li>{team}</li>
+              }
+              </For>
+            </ul>
+          </li>
+        }
+        </For>
       </ul>
     </div>
   );

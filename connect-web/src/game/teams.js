@@ -31,7 +31,7 @@ export function checkTeamRename(gameTeamCode) {
         case 'SFG': return new Set(['NYG', 'SFG']);
         case 'TBD': return new Set(['TBD', 'TBR']);
         case 'TEX': return new Set(['TEX', 'WSA']);
-        case 'WSN': return new Set(['MON', 'WSH']);
+        case 'WSN': return new Set(['MON', 'WSN']);
         default: return new Set([gameTeamCode]);
     }
 }

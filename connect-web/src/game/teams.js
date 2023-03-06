@@ -51,6 +51,8 @@ export function checkPlayerTeams(teams, playerTeams) {
     const [team1, team2] = teams;
     const otherNames1 = checkTeamRename(team1);
     const otherNames2 = checkTeamRename(team2);
+    console.log(otherNames1);
+    console.log(otherNames2);
     var team1Check = false;
     var team2Check = false;
     otherNames1.forEach(t => {

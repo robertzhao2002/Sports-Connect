@@ -1,17 +1,8 @@
 import logo from './logo.svg';
 import styles from './App.module.css';
-import { searchPlayer } from './game/search.js';
+import { searchPlayer, singleSolution } from './game/search.js';
 import { checkPlayerTeams, createGame, randomTeams } from './game/teams.js';
-import { batch, createSignal, createEffect, Show } from "solid-js";
-
-function createGrid(sideLength) {
-  const result = [];
-  for (var i = 0; i < sideLength; i++) {
-    result[i] = new Array(sideLength);
-  }
-  return result;
-}
-
+import { batch, createSignal, Show } from "solid-js";
 
 function App() {
   const length = 3;
@@ -32,26 +23,51 @@ function App() {
       console.log(player());
       searchPlayer(player()).then(function (result) {
         if (result == null) {
-          console.log("bad input");
+          alert("bad input");
         } else if (result.length > 1) {
 
         } else {
+          console.log(result[0].teams);
           Object.entries(board).forEach((e) => {
             const [teams, answer] = e;
-            if (checkPlayerTeams(teams.split(','), result[0].teams)) {
+            console.log(answer);
+            if (checkPlayerTeams(teams.split(','), result[0].teams) && answer.player == null) {
               const [row, col] = answer.coordinates;
-              board[teams] = result[0].name
+              console.log(answer);
+              board[teams].player = result[0].name
               showGrid[row + 1][col + 1] = result[0].imageUrl;
-              setGridSignal(showGrid);
+              const newGrid = new Array(length + 1);
+              for (var i = 0; i < showGrid.length; i++) {
+                newGrid[i] = [];
+                for (var j = 0; j < showGrid.length; j++)
+                  newGrid[i][j] = showGrid[i][j];
+              }
+              setGridSignal(newGrid);
               console.log("Correct");
               console.log(board);
             }
-          })
+          });
         }
       });
       setInputField("");
     });
   };
+
+  const hint = (event) => {
+    event.preventDefault();
+    batch(() => {
+      Object.entries(board).forEach((e) => {
+        const [teams, answer] = e;
+        if (answer.player == null) {
+          singleSolution(teams.split(','), false, true).then(function (result) {
+            console.log(result);
+          });
+          return;
+        }
+      });
+
+    });
+  }
   console.log(gridSignal());
   return (
     <div>
@@ -61,14 +77,14 @@ function App() {
             <tr><For each={teams}>{item =>
               <Show
                 when={item != null}
-                fallback={<td><spacer width="125" height="125" /></td>}
+                fallback={<td><spacer width="125px" height="125px" /></td>}
               >
                 <Show
                   when={item.length > 3}
                   fallback={
-                    <img src={`/team-logos/${item}.png`} />
+                    <td><img src={`/team-logos/${item}.png`} width="125px" height="125px" /></td>
                   }>
-                  <img src={item} />
+                  <td><img src={item} width="125px" height="125px" /></td>
                 </Show>
               </Show>
             }</For></tr>
@@ -84,7 +100,8 @@ function App() {
         />
         <button type="submit">Check</button>
       </form>
-
+      <button onClick={() => console.log("F")}>Solve</button>
+      <button onClick={hint}>Hint</button>
     </div>
   );
 }

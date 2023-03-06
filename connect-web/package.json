@@ -15,8 +15,10 @@
     "vite-plugin-solid": "^2.5.0"
   },
   "dependencies": {
+    "@stdlib/random-sample": "^0.0.7",
     "cheerio": "^1.0.0-rc.12",
     "node-fetch": "^3.3.0",
+    "prompt-sync": "^4.2.0",
     "solid-js": "^1.6.10"
   }
 }

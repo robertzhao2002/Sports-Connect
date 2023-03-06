@@ -15,9 +15,9 @@ export async function searchPlayer(name) {
     while (true && count <= 15) {
         try {
             const [firstLetter, nameID] = bbRefId(name, count);
-            const url = `https://www.baseball-reference.com/players/${firstLetter}/${nameID}.shtml`;
+            const url = `https://cors-anywhere.herokuapp.com/https://www.baseball-reference.com/players/${firstLetter}/${nameID}.shtml`;
             // console.log(url);
-            const response = await fetch(url, { 'mode': 'cors' });
+            const response = await fetch(url);
             // console.log(response.status);
             if (response.status != 200) {
                 badInput = first;
@@ -66,8 +66,8 @@ export async function singleSolution(teamPair, pitcher = false, inGame = false) 
     const secondTeam = teamPair[1];
     const unknown = { playerName: 'unknown', playerStat: 0 };
     const bestTwo = { [firstTeam]: unknown, [secondTeam]: unknown };
-    const url = `https://www.baseball-reference.com/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
-    const response = await fetch(url, { 'mode': 'cors' });
+    const url = `https://cors-anywhere.herokuapp.com/https://www.baseball-reference.com/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
+    const response = await fetch(url);
     console.log(response.status);
     if (response.status == 200) {
         const body = await response.text();

@@ -124,7 +124,7 @@ function App() {
           <For each={searchResult()}>{item =>
             <li>
               <img src={item.imageUrl} />{item.name}: {item.years.start}-{item.years.end}
-              <button onClick={() => { checkResult(item); }}>Select</button>
+              <button onClick={() => { checkResult(item); setSearchResult([]); }}>Select</button>
             </li>
           }
           </For>

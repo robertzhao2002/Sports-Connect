@@ -68,6 +68,7 @@ export async function singleSolution(teamPair, pitcher = false, inGame = false) 
     const bestTwo = { [firstTeam]: unknown, [secondTeam]: unknown };
     const url = `https://www.baseball-reference.com/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
     const response = await fetch(url, { 'mode': 'cors' });
+    console.log(response.status);
     if (response.status == 200) {
         const body = await response.text();
         const $ = cheerio.load(body);

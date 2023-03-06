@@ -46,3 +46,18 @@ export function createGame(teams) {
     }
     return board;
 }
+
+export function checkPlayerTeams(teams, playerTeams) {
+    const [team1, team2] = teams;
+    const otherNames1 = checkTeamRename(team1);
+    const otherNames2 = checkTeamRename(team2);
+    var team1Check = false;
+    var team2Check = false;
+    otherNames1.forEach(t => {
+        if (playerTeams.has(t)) team1Check = true;
+    });
+    otherNames2.forEach(t => {
+        if (playerTeams.has(t)) team2Check = true;
+    });
+    return team1Check && team2Check;
+}

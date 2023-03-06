@@ -57,7 +57,7 @@ function App() {
           setSearchResult(result);
         } else {
           console.log(result[0].teams);
-          checkResult(result);
+          checkResult(result[0]);
         }
       });
       setInputField("");

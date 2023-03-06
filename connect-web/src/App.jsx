@@ -121,14 +121,23 @@ function App() {
         />
         <button type="submit">Check</button>
       </form>
+      <br />
+      <br />
+      <div>
+        <h2>Before you start, you need to activate a CORS Proxy to query Baseball Reference</h2>
+        <a href="https://cors-anywhere.herokuapp.com" target="_blank">Activate CORS Proxy</a>
+      </div>
 
-      <br></br>
+      <br />
+      <br />
       <button onClick={restart}>Restart</button>
 
-      <br></br>
+      <br />
+      <br />
       <button onClick={hint}>Hint</button>
 
-      <br></br>
+      <br>
+      </br>
       <button onClick={() => console.log("F")}>Solve</button>
 
       <table>

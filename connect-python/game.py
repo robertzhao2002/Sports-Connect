@@ -1,11 +1,19 @@
 import random, pprint
-from teams import TEAM_CODES, name_changes
+from teams import TEAM_CODES, name_changes_mlb
 from search import search_player, suggest_single_solution, possible_solution
 
 pp = pprint.PrettyPrinter(indent=4)
 TEAMS = TEAM_CODES
 side_length = int(input("Enter the number of teams you want on one side of the square: "))
-teams = random.sample(TEAMS, side_length * 2)
+random = True if input("Random teams or custom? ").strip().lower() == 'random' else False
+teams = []
+if random:
+    teams = random.sample(TEAMS, side_length * 2)
+else:
+    for i in range(side_length):
+        teams.append(input("Enter Row Team {}: ".format(str(i+1))).strip().upper())
+    for i in range(side_length):
+        teams.append(input("Enter Column Team {}: ".format(str(i+1))).strip().upper())
 game_state = {}
 solution = None
 score = 0
@@ -15,19 +23,23 @@ for i in range(side_length):
     for j in range(side_length, len(teams)):
         game_state[(teams[i], teams[j])] = ''
 
-# game_state  = {('CLE', 'LAL'): ''}
+game_state  = {
+    ('MIN', 'TOR'): '', ('MIN', 'CHC'): '', ('MIN','ANA'): '',
+    ('LAD', 'TOR'): '',('LAD', 'CHC'): '',('LAD', 'ANA'): '',
+    ('FLA', 'TOR'): '', ('FLA', 'CHC'): '', ('FLA', 'ANA'): ''
+}
 pp.pprint(game_state)
 
 def check_teams(player):
     player_teams = player['teams']
     for pair in game_state:
         def check_name_changes(a):
-            for n in name_changes(a):
+            for n in name_changes_mlb(a):
                 if n in player_teams:
                     return True
             return False
-        team_1_check = pair[0] in player_teams or check_name_changes(pair[0])
-        team_2_check = pair[1] in player_teams or check_name_changes(pair[1])
+        team_1_check = pair[0] in check_name_changes(pair[0])
+        team_2_check = pair[1] in check_name_changes(pair[1])
         if team_1_check and team_2_check and len(game_state[pair]) == 0:
             game_state[pair] = player['name']
             return True

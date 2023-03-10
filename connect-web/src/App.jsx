@@ -1,50 +1,90 @@
 import styles from './App.module.css';
 import { searchPlayer, singleSolution } from './game/search.js';
-import { checkPlayerTeams, createGame, randomTeams } from './game/teams.js';
+import { checkPlayerTeams, getMatrix, randomTeams } from './game/teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
-function App() {
-  const length = 2;
-  const maxScore = length * length;
-  const teams = randomTeams(length * 2);
-  const board = createGame(teams);
+function createGrid(length, teams) {
   const showGrid = new Array(length + 1);
   for (var i = 1; i < showGrid.length; i++) {
     showGrid[i] = [teams[i - 1]].concat(Array(length).fill(null));
   }
   showGrid[0] = [null].concat(teams.slice(length, 2 * length));
+  return showGrid;
+}
+
+function createGame(length) {
+  const teams = randomTeams(length * 2);
+  return {
+    score: 0,
+    board: getMatrix(teams),
+    grid: createGrid(length, teams),
+  };
+}
+
+function boardCopy(b) {
+  const result = {};
+  for (const e of Object.keys(b)) {
+    result[e] = b[e];
+  }
+  return result;
+}
+
+function gridCopy(g) {
+  const result = new Array(g.length);
+  for (var i = 0; i < g.length; i++) {
+    result[i] = new Array(g[i].length);
+    for (var j = 0; j < g[i].length; j++) {
+      result[i][j] = g[i][j];
+    }
+  }
+  return result;
+}
+
+function gameCopy(g) {
+  return {
+    score: g.score,
+    board: boardCopy(g.board),
+    grid: gridCopy(g.grid)
+  };
+}
+
+function App() {
+  const length = 1;
+  const maxScore = length * length;
+  const game = createGame(length);
+  const [gameSignal, setGameSignal] = createSignal(game);
   const [inputField, setInputField] = createSignal("");
   const [player, setPlayer] = createSignal("");
-  const [gridSignal, setGridSignal] = createSignal(showGrid);
-  const [score, setScore] = createSignal(0);
   const [searchResult, setSearchResult] = createSignal([]);
   const [pastGuesses, setPastGuesses] = createSignal([]);
 
   const checkResult = function (item) {
-    const newResult = [item, ...pastGuesses()];
-    setPastGuesses(newResult);
-    for (const e of Object.entries(board)) {
+    const wrong = { correct: false };
+    const correct = { correct: true, correctTeams: null };
+    for (const e of Object.entries(gameSignal().board)) {
       const [teams, answer] = e;
       console.log(answer);
       if (checkPlayerTeams(teams.split(','), item.teams) && answer.player == null) {
         const [row, col] = answer.coordinates;
         console.log(answer);
-        board[teams].player = item.name
-        showGrid[row + 1][col + 1] = item.imageUrl;
-        const newGrid = new Array(length + 1);
-        for (var i = 0; i < showGrid.length; i++) {
-          newGrid[i] = [];
-          for (var j = 0; j < showGrid.length; j++)
-            newGrid[i][j] = showGrid[i][j];
-        }
-        setGridSignal(newGrid);
+        gameSignal().board[teams].player = item.name
+        gameSignal().grid[row + 1][col + 1] = item.imageUrl;
+        gameSignal().score++;
+        setGameSignal(gameCopy(gameSignal()));
         console.log("Correct");
-        console.log(board);
-        setScore(score() + 1);
-        if (score() == maxScore) alert("You Win!");
+        console.log(gameSignal());
+        const guessSuccess = Object.assign(correct, item);
+        guessSuccess.correctTeams = teams.split(',');
+        const newResult = [guessSuccess, ...pastGuesses()];
+        setPastGuesses(newResult);
         break;
+      } else {
+        const newResult = [Object.assign(wrong, item), ...pastGuesses()];
+        setPastGuesses(newResult);
+
       }
     }
+
   }
 
   const submit = (event) => {
@@ -69,7 +109,7 @@ function App() {
   const hint = (event) => {
     event.preventDefault();
     batch(() => {
-      for (const e of Object.entries(board)) {
+      for (const e of Object.entries(gameSignal().board)) {
         const [teams, answer] = e;
         if (answer.player == null) {
           singleSolution(teams.split(','), false, true).then(function (result) {
@@ -85,16 +125,19 @@ function App() {
     event.preventDefault();
     batch(() => {
       console.log("restarting...");
+      setGameSignal(createGame(length));
     });
   }
-
-  console.log(gridSignal());
   return (
     <div align="center">
+      <Show
+        when={gameSignal().score == maxScore}>
+        <h1>You Win!</h1>
+      </Show>
       <h1>Connect the teams by naming a player that played for both teams!</h1>
       <table>
         <tbody>
-          <For each={gridSignal()}>{teams =>
+          <For each={gameSignal().grid}>{teams =>
             <tr><For each={teams}>{item =>
               <Show
                 when={item != null}
@@ -145,7 +188,7 @@ function App() {
           <Show
             when={searchResult().length >= 2}
           >
-            <h1>Which One?</h1>
+            <th>Which One?</th>
             <For each={searchResult()}>{item =>
               <tr>
                 <td><img height="100" width="100" src={item.imageUrl} /></td>
@@ -179,6 +222,14 @@ function App() {
                   }
                   </For>
                 </ul>
+              </td>
+              <td>
+                <Show
+                  when={item.correct == true}
+                  fallback={<img src="/pictures/wrong.png" width="50px" height="50px" />}>
+                  <img src="/pictures/correct.png" width="50px" height="50px" />
+                  <span>{item.correctTeams[0]}&{item.correctTeams[1]}</span>
+                </Show>
               </td>
             </tr>
           }

@@ -7,15 +7,17 @@ export function bbRefId(name, number) {
     return [surname[0], surname.slice(0, 5) + givenName.slice(0, 2) + '0' + number];
 }
 
-export async function searchPlayer(name) {
+export async function searchPlayer(name, mlb = true) {
     var count = 1;
     var first = true;
     var badInput = false;
     var searchResults = [];
+    const sportName = (mlb) ? "baseball" : "basketball";
+    const ext = (mlb) ? "shtml" : "html";
     while (true && count <= 15) {
         try { //
             const [firstLetter, nameID] = bbRefId(name, count);
-            const url = `https://cors-anywhere.herokuapp.com/https://www.baseball-reference.com/players/${firstLetter}/${nameID}.shtml`;
+            const url = `https://cors-anywhere.herokuapp.com/https://www.${sportName}-reference.com/players/${firstLetter}/${nameID}.${ext}`;
             // console.log(url);
             const response = await fetch(url);
             console.log(response.status);

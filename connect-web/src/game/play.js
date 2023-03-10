@@ -1,4 +1,4 @@
-import { randomTeams, createGame } from './teams.js';
+import { randomTeams, getMatrix } from './teams.js';
 import { possibleSolution } from './search.js';
 import promptSync from 'prompt-sync'
 
@@ -7,7 +7,7 @@ const prompt = promptSync();
 const length = parseInt(prompt('Enter the number of teams you want on one side of the square: '));
 const maxScore = length * length;
 const teams = randomTeams(length * 2);
-const board = createGame(teams);
+const board = getMatrix(teams);
 
 // board = { 'PHI,TOR': null };
 // createGame(2);

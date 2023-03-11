@@ -81,7 +81,7 @@ export async function searchPlayer(name, mlb = true, browser = true) {
                         const stints = teams[team].length;
                         teams[team][stints - 1].end = year;
                     }
-                    if (team != 'TOT') prevTeam = team;
+                    prevTeam = team;
                 };
                 count++;
                 console.log(teams);

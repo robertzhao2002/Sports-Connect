@@ -61,30 +61,34 @@ export function PastGuesses() {
                         <td>
                             <p>{item.name}</p>
                             <p>{item.years.start}-{item.years.end}</p>
+                            <img src={`/pictures/${item.league}.png`} height="25" width="25" />
                         </td>
                         <td>
                             <For each={Object.entries(item.teams)}>{ty =>
-                                <div>
-                                    <span><img src={`/team-logos/${item.league}/${ty[0]}.png`} height="25" width="25" />
-                                        <For each={ty[1]}>{yr =>
-                                            <Show
-                                                when={yr.end - yr.start > 0}
-                                                fallback={<span> ({yr.start})</span>}>
-                                                <span> ({yr.start}-{yr.end})</span>
-                                            </Show>
-                                        }</For>
-                                    </span>
-
+                                <div class="pastGuessesCol">
+                                    <img src={`/team-logos/${item.league}/${ty[0]}.png`} height="25" width="25" />
+                                    <For each={ty[1]}>{yr =>
+                                        <Show
+                                            when={yr.end - yr.start > 0}
+                                            fallback={<span>({yr.start})</span>}>
+                                            <span>({yr.start}-{yr.end})</span>
+                                        </Show>
+                                    }</For>
                                 </div>
-
                             }
                             </For>
                         </td>
                         <Show
                             when={item.correct == true}
                             fallback={<td><img src="/pictures/wrong.png" width="50px" height="50px" /></td>}>
-                            <td><img src="/pictures/correct.png" width="50px" height="50px" /></td>
-                            <td><span>{item.correctTeams[0]}/{item.correctTeams[1]}</span></td>
+                            <td>
+                                <div class="pastGuessesCol">
+                                    <img src="/pictures/correct.png" width="50px" height="50px" />
+                                    <img src={`/team-logos/${item.league}/${item.correctTeams[0]}.png`} height="25" width="25" />
+                                    <span>⇔</span>
+                                    <img src={`/team-logos/${item.league}/${item.correctTeams[1]}.png`} height="25" width="25" />
+                                </div>
+                            </td>
                         </Show>
 
                     </tr>
@@ -150,7 +154,7 @@ export function ConnectGame(MLB, length) {
         });
     };
 
-    const restart = (event) => {
+    const newGame = (event) => {
         event.preventDefault();
         batch(() => {
             setGameSignal(createGame(MLB, length));
@@ -216,7 +220,7 @@ export function ConnectGame(MLB, length) {
             </form>
             <br />
             <br />
-            <button onClick={restart}>Restart</button>
+            <button onClick={newGame}>New</button>
             <Show
                 when={MLB == true}>
                 <br />

@@ -23,3 +23,19 @@ code {
 #pastGuesses tr:last-child {
   border-bottom: none;
 }
+
+.pastGuessesCol {
+  display: flex;
+  align-items: center;
+  padding: 3px;
+}
+
+.pastGuessesCol img {
+  padding: 3px;
+}
+
+#pastGuesses tbody {
+  display: inline-block;
+  height: 300px;
+  overflow-y: scroll;
+}

@@ -11,3 +11,15 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+#pastGuesses {
+  border-collapse: collapse;
+}
+
+#pastGuesses tr {
+  border-bottom: 1px solid black;
+}
+
+#pastGuesses tr:last-child {
+  border-bottom: none;
+}

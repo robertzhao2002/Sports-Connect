@@ -1,4 +1,4 @@
-import '../App.module.css'
+import '../index.css';
 import { searchPlayer, singleSolution } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
@@ -53,7 +53,7 @@ function gameCopy(g) {
 export function PastGuesses() {
     return (<div align="center">
         <h1>Past Guesses</h1>
-        <table>
+        <table id="pastGuesses">
             <tbody>
                 <For each={pastGuesses()}>{item =>
                     <tr>

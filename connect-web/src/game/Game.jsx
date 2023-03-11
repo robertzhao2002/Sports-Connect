@@ -3,7 +3,7 @@ import { searchPlayer, singleSolution } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
-const [pastGuesses, setPastGuesses] = createSignal([]);
+export const [pastGuesses, setPastGuesses] = createSignal([]);
 
 function createGrid(teams, length) {
     const showGrid = new Array(length + 1);

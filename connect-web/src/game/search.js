@@ -7,7 +7,7 @@ export function bbRefId(name, number) {
     return [surname[0], surname.slice(0, 5) + givenName.slice(0, 2) + '0' + number];
 }
 
-export async function searchPlayer(name, mlb = true) {
+export async function searchPlayer(name, mlb = true, browser = true) {
     var count = 1;
     var first = true;
     var badInput = false;
@@ -17,8 +17,8 @@ export async function searchPlayer(name, mlb = true) {
     while (true && count <= 15) {
         try { //
             const [firstLetter, nameID] = bbRefId(name, count);
-            const url = `https://cors-anywhere.herokuapp.com/https://www.${sportName}-reference.com/players/${firstLetter}/${nameID}.${ext}`;
-            // console.log(url);
+            const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}https://www.${sportName}-reference.com/players/${firstLetter}/${nameID}.${ext}`;
+            console.log(url);
             const response = await fetch(url);
             console.log(response.status);
             if (response.status != 200) {
@@ -31,30 +31,49 @@ export async function searchPlayer(name, mlb = true) {
                 const $ = cheerio.load(body);
                 var start = Number.MAX_SAFE_INTEGER;
                 var end = Number.MIN_SAFE_INTEGER;
-                var startTeam = 0;
-                var endTeam = 0;
+                var teamStartYear = 0;
+                var teamEndYear = 0;
                 var prevTeam = null;
                 const teams = {};
                 const playerName = $('h1').text().trim();
                 const playerImgUrl = $('.media-item > img').attr('src');
                 var searchFields = $('#pitching_standard > tbody > .full, .partial_table');
                 if ($('#pitching_standard > tbody > .full').length == 0) {
-                    searchFields = $('#batting_standard > tbody > .full, .partial_table')
+                    if (mlb) {
+                        searchFields = $('#batting_standard > tbody > .full, .partial_table');
+                    } else {
+                        searchFields = $('#per_game > tbody > .full_table, .partial_table');
+                    }
+
                 }
-                searchFields.map((_, element) => {
-                    const year = parseInt($(element).find('[data-stat=year_ID]').text().trim());
+                for (const element of searchFields) {
+                    var year = 0;
+                    if (mlb) {
+                        year = parseInt($(element).find('[data-stat=year_ID]').text().trim());
+                    } else {
+                        const idValue = $(element).attr('id');
+                        if (idValue != undefined) {
+                            year = parseInt(idValue.slice(-4).trim());
+                            if (year < end) break;
+                        }
+                        else {
+                            year = NaN;
+                        }
+                    }
+                    console.log("Year", year);
                     if (year >= end) end = year;
                     if (year <= start) start = year;
-                    const team = $(element).find('[data-stat=team_ID]').text().trim();
+                    const team = $(element).find(`[data-stat=${(mlb) ? 'team_ID' : 'team_id'}]`).text().trim();
+                    if (team == 'TOT') continue;
                     if (team != prevTeam && team != 'TOT' && team.trim() != '') {
-                        startTeam = year;
-                        endTeam = year;
+                        teamStartYear = year;
+                        teamEndYear = year;
                         if (team in teams) {
-                            const a = { start: startTeam, end: endTeam };
+                            const a = { start: teamStartYear, end: teamEndYear };
                             teams[team].push(a);
                         }
                         else {
-                            teams[team] = [{ start: startTeam, end: endTeam }];
+                            teams[team] = [{ start: teamStartYear, end: teamEndYear }];
                         }
                     }
                     if (team != 'TOT' && team.trim() != '') {
@@ -62,7 +81,7 @@ export async function searchPlayer(name, mlb = true) {
                         teams[team][stints - 1].end = year;
                     }
                     if (team != 'TOT') prevTeam = team;
-                });
+                };
                 count++;
                 console.log(teams);
                 searchResults.push({
@@ -124,11 +143,15 @@ export async function possibleSolution(teams) {
     return solution;
 }
 
-// searchPlayer('barry zito').then(function (result) {
+// searchPlayer('barry zito', true, false).then(function (result) {
 //     console.log(result[0].teams['OAK'].forEach(a => {
 //         console.log(a);
 //     }));
 // });
 // console.log(searchPlayer('charlie morton'));
-// singleSolution(['PHI', 'TOR'], true);
-
+// searchPlayer('tracy mcgrady', false, false).then(function (result) {
+//     result[0].teams['HOU'].forEach(a => {
+//         console.log(a);
+//     })
+//     console.log(result);
+// });

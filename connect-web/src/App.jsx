@@ -3,7 +3,10 @@ import { searchPlayer, singleSolution } from './game/search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './game/teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
-function createGrid(length, teams) {
+const MLB = false;
+const length = 1;
+
+function createGrid(teams) {
   const showGrid = new Array(length + 1);
   for (var i = 1; i < showGrid.length; i++) {
     showGrid[i] = [teams[i - 1]].concat(Array(length).fill(null));
@@ -12,12 +15,12 @@ function createGrid(length, teams) {
   return showGrid;
 }
 
-function createGame(length) {
-  const teams = randomTeams(length * 2);
+function createGame() {
+  const teams = randomTeams(length * 2, MLB);
   return {
     score: 0,
     board: getMatrix(teams),
-    grid: createGrid(length, teams),
+    grid: createGrid(teams),
   };
 }
 
@@ -49,9 +52,8 @@ function gameCopy(g) {
 }
 
 function App() {
-  const length = 1;
   const maxScore = length * length;
-  const game = createGame(length);
+  const game = createGame();
   const [gameSignal, setGameSignal] = createSignal(game);
   const [inputField, setInputField] = createSignal("");
   const [player, setPlayer] = createSignal("");
@@ -81,7 +83,6 @@ function App() {
       } else {
         const newResult = [Object.assign(wrong, item), ...pastGuesses()];
         setPastGuesses(newResult);
-
       }
     }
 
@@ -92,7 +93,7 @@ function App() {
     batch(() => {
       setPlayer(inputField());
       console.log(player());
-      searchPlayer(player().toLowerCase()).then(function (result) {
+      searchPlayer(player().toLowerCase(), MLB, true).then(function (result) {
         if (result == null) {
           alert("bad input");
         } else if (result.length > 1) {
@@ -125,7 +126,7 @@ function App() {
     event.preventDefault();
     batch(() => {
       console.log("restarting...");
-      setGameSignal(createGame(length));
+      setGameSignal(createGame());
     });
   }
   return (
@@ -146,7 +147,7 @@ function App() {
                 <Show
                   when={item.length > 3}
                   fallback={
-                    <td><img src={`/team-logos/mlb/${item}.png`} width="125px" height="125px" /></td>
+                    <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="125px" height="125px" /></td>
                   }>
                   <td><img src={item} width="125px" height="125px" /></td>
                 </Show>
@@ -157,7 +158,7 @@ function App() {
       </table>
       <form onSubmit={submit}>
         <input
-          placeholder='Michael Harris'
+          placeholder={(MLB) ? 'Michael Harris' : 'Quinndary Weatherspoon'}
           value={inputField()}
           onInput={(e) => setInputField(e.currentTarget.value)}
           required
@@ -167,7 +168,7 @@ function App() {
       <br />
       <br />
       <div>
-        <h2>Before you start, you need to activate a CORS Proxy to query Baseball Reference</h2>
+        <h2>Before you start, you need to activate a CORS Proxy to query Sports Reference</h2>
         <a href="https://cors-anywhere.herokuapp.com" target="_blank">Activate CORS Proxy</a>
       </div>
 
@@ -223,14 +224,12 @@ function App() {
                   </For>
                 </ul>
               </td>
-              <td>
-                <Show
-                  when={item.correct == true}
-                  fallback={<img src="/pictures/wrong.png" width="50px" height="50px" />}>
-                  <img src="/pictures/correct.png" width="50px" height="50px" />
-                  <span>{item.correctTeams[0]}&{item.correctTeams[1]}</span>
-                </Show>
-              </td>
+              <Show
+                when={item.correct == true}
+                fallback={<td><img src="/pictures/wrong.png" width="50px" height="50px" /></td>}>
+                <td><img src="/pictures/correct.png" width="50px" height="50px" /></td>
+                <td><span>{item.correctTeams[0]}&{item.correctTeams[1]}</span></td>
+              </Show>
             </tr>
           }
           </For>

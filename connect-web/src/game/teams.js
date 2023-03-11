@@ -78,10 +78,10 @@ export function getMatrix(teams) {
     return board;
 }
 
-export function checkPlayerTeams(teams, playerTeams) {
+export function checkPlayerTeams(teams, playerTeams, mlb = true) {
     const [team1, team2] = teams;
-    const otherNames1 = checkTeamRenameMLB(team1);
-    const otherNames2 = checkTeamRenameMLB(team2);
+    const otherNames1 = (mlb) ? checkTeamRenameMLB(team1) : checkTeamRenameNBA(team1);
+    const otherNames2 = (mlb) ? checkTeamRenameMLB(team2) : checkTeamRenameNBA(team2);
     var team1Check = false;
     var team2Check = false;
     console.log(playerTeams);

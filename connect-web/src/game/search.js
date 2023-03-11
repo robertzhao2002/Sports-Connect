@@ -70,7 +70,8 @@ export async function searchPlayer(name, mlb = true, browser = true) {
                         teamEndYear = year;
                         if (team in teams) {
                             const a = { start: teamStartYear, end: teamEndYear };
-                            teams[team].push(a);
+                            if (!teams[team].find(s => a.start == a.start && s.end == a.end))
+                                teams[team].push(a);
                         }
                         else {
                             teams[team] = [{ start: teamStartYear, end: teamEndYear }];

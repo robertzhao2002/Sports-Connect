@@ -1,3 +1,4 @@
+import '../App.module.css'
 import { searchPlayer, singleSolution } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
@@ -57,22 +58,27 @@ export function PastGuesses() {
                 <For each={pastGuesses()}>{item =>
                     <tr>
                         <td><img height="100" width="100" src={item.imageUrl} /></td>
-                        <td><p>{item.name}: {item.years.start}-{item.years.end}</p></td>
                         <td>
-                            <ul>
-                                <For each={Object.entries(item.teams)}>{ty =>
-                                    <li><img src={`/team-logos/${item.league}/${ty[0]}.png`} height="25" width="25" />
+                            <p>{item.name}</p>
+                            <p>{item.years.start}-{item.years.end}</p>
+                        </td>
+                        <td>
+                            <For each={Object.entries(item.teams)}>{ty =>
+                                <div>
+                                    <span><img src={`/team-logos/${item.league}/${ty[0]}.png`} height="25" width="25" />
                                         <For each={ty[1]}>{yr =>
                                             <Show
                                                 when={yr.end - yr.start > 0}
                                                 fallback={<span> ({yr.start})</span>}>
-                                                <span> ({yr.start} to {yr.end})</span>
+                                                <span> ({yr.start}-{yr.end})</span>
                                             </Show>
                                         }</For>
-                                    </li>
-                                }
-                                </For>
-                            </ul>
+                                    </span>
+
+                                </div>
+
+                            }
+                            </For>
                         </td>
                         <Show
                             when={item.correct == true}
@@ -80,6 +86,7 @@ export function PastGuesses() {
                             <td><img src="/pictures/correct.png" width="50px" height="50px" /></td>
                             <td><span>{item.correctTeams[0]}/{item.correctTeams[1]}</span></td>
                         </Show>
+
                     </tr>
                 }
                 </For>

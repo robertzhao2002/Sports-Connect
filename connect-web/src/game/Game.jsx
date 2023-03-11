@@ -211,7 +211,7 @@ export function ConnectGame(MLB, length) {
             </table>
             <form onSubmit={submit}>
                 <input
-                    placeholder={(MLB) ? 'Michael Harris' : 'Quinndary Weatherspoon'}
+                    placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
                     value={inputField()}
                     onInput={(e) => setInputField(e.currentTarget.value)}
                     required

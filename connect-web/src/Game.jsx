@@ -2,9 +2,7 @@ import { searchPlayer, singleSolution } from './game/search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './game/teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
-const length = 3;
-
-function createGrid(teams) {
+function createGrid(teams, length) {
     const showGrid = new Array(length + 1);
     for (var i = 1; i < showGrid.length; i++) {
         showGrid[i] = [teams[i - 1]].concat(Array(length).fill(null));
@@ -13,12 +11,12 @@ function createGrid(teams) {
     return showGrid;
 }
 
-function createGame(MLB) {
+function createGame(MLB, length) {
     const teams = randomTeams(length * 2, MLB);
     return {
         score: 0,
         board: getMatrix(teams),
-        grid: createGrid(teams),
+        grid: createGrid(teams, length),
     };
 }
 
@@ -49,17 +47,33 @@ function gameCopy(g) {
     };
 }
 
-export function NBA() {
+export function NBAMini() {
+    return ConnectGame(false, 1);
+}
+
+export function MLBMini() {
+    return ConnectGame(true, 1);
+}
+
+export function NBAMedium() {
+    return ConnectGame(false, 2);
+}
+
+export function MLBMedium() {
+    return ConnectGame(true, 2);
+}
+
+export function NBALarge() {
     return ConnectGame(false, 3);
 }
 
-export function MLB() {
+export function MLBLarge() {
     return ConnectGame(true, 3);
 }
 
 function ConnectGame(MLB, length) {
     const maxScore = length * length;
-    const game = createGame(MLB);
+    const game = createGame(MLB, length);
     const [gameSignal, setGameSignal] = createSignal(game);
     const [inputField, setInputField] = createSignal("");
     const [player, setPlayer] = createSignal("");
@@ -113,6 +127,13 @@ function ConnectGame(MLB, length) {
         });
     };
 
+    const restart = (event) => {
+        event.preventDefault();
+        batch(() => {
+            setGameSignal(createGame(MLB, length));
+        });
+    }
+
     const hint = (event) => {
         event.preventDefault();
         batch(() => {
@@ -128,11 +149,10 @@ function ConnectGame(MLB, length) {
         });
     }
 
-    const restart = (event) => {
+    const solve = (event) => {
         event.preventDefault();
         batch(() => {
-            console.log("restarting...");
-            setGameSignal(createGame(MLB));
+            console.log("solving...");
         });
     }
     return (
@@ -182,7 +202,7 @@ function ConnectGame(MLB, length) {
 
                 <br>
                 </br>
-                <button onClick={() => console.log("F")}>Solve</button>
+                <button onClick={solve}>Solve</button>
             </Show>
 
             <table>

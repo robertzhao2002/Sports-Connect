@@ -1,5 +1,6 @@
 import { batch, createSignal, Show } from "solid-js";
-import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge } from "./Game";
+import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge } from "./game/Modes";
+import { PastGuesses } from "./game/Game";
 
 const [gameState, setGameState] = createSignal({ state: "Loading" });
 const State = {
@@ -129,6 +130,7 @@ function App() {
           </div>
         </div>
       </Show>
+      <PastGuesses />
     </div>
   );
 }

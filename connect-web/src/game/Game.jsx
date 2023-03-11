@@ -1,6 +1,8 @@
-import { searchPlayer, singleSolution } from './game/search.js';
-import { checkPlayerTeams, getMatrix, randomTeams } from './game/teams.js';
+import { searchPlayer, singleSolution } from './search.js';
+import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
+
+const [pastGuesses, setPastGuesses] = createSignal([]);
 
 function createGrid(teams, length) {
     const showGrid = new Array(length + 1);
@@ -47,42 +49,56 @@ function gameCopy(g) {
     };
 }
 
-export function NBAMini() {
-    return ConnectGame(false, 1);
+export function PastGuesses() {
+    return (<div align="center">
+        <h1>Past Guesses</h1>
+        <table>
+            <tbody>
+                <For each={pastGuesses()}>{item =>
+                    <tr>
+                        <td><img height="100" width="100" src={item.imageUrl} /></td>
+                        <td><p>{item.name}: {item.years.start}-{item.years.end}</p></td>
+                        <td>
+                            <ul>
+                                <For each={Object.entries(item.teams)}>{ty =>
+                                    <li><img src={`/team-logos/${item.league}/${ty[0]}.png`} height="25" width="25" />
+                                        <For each={ty[1]}>{yr =>
+                                            <Show
+                                                when={yr.end - yr.start > 0}
+                                                fallback={<span> ({yr.start})</span>}>
+                                                <span> ({yr.start} to {yr.end})</span>
+                                            </Show>
+                                        }</For>
+                                    </li>
+                                }
+                                </For>
+                            </ul>
+                        </td>
+                        <Show
+                            when={item.correct == true}
+                            fallback={<td><img src="/pictures/wrong.png" width="50px" height="50px" /></td>}>
+                            <td><img src="/pictures/correct.png" width="50px" height="50px" /></td>
+                            <td><span>{item.correctTeams[0]}/{item.correctTeams[1]}</span></td>
+                        </Show>
+                    </tr>
+                }
+                </For>
+            </tbody>
+        </table>
+    </div>);
 }
 
-export function MLBMini() {
-    return ConnectGame(true, 1);
-}
-
-export function NBAMedium() {
-    return ConnectGame(false, 2);
-}
-
-export function MLBMedium() {
-    return ConnectGame(true, 2);
-}
-
-export function NBALarge() {
-    return ConnectGame(false, 3);
-}
-
-export function MLBLarge() {
-    return ConnectGame(true, 3);
-}
-
-function ConnectGame(MLB, length) {
+export function ConnectGame(MLB, length) {
     const maxScore = length * length;
     const game = createGame(MLB, length);
     const [gameSignal, setGameSignal] = createSignal(game);
     const [inputField, setInputField] = createSignal("");
     const [player, setPlayer] = createSignal("");
     const [searchResult, setSearchResult] = createSignal([]);
-    const [pastGuesses, setPastGuesses] = createSignal([]);
-
+    const leagueString = (MLB) ? "mlb" : "nba";
     const checkResult = function (item) {
-        const wrong = { correct: false };
-        const correct = { correct: true, correctTeams: null };
+        const wrong = { league: leagueString, correct: false };
+        const correct = { league: leagueString, correct: true, correctTeams: null };
         for (const e of Object.entries(gameSignal().board)) {
             const [teams, answer] = e;
             const teamList = teams.split(',');
@@ -221,41 +237,6 @@ function ConnectGame(MLB, length) {
                         </For>
                     </Show>
                 </tbody>
-            </table>
-            <h1>Past Guesses</h1>
-            <table>
-                <tbody>
-                    <For each={pastGuesses()}>{item =>
-                        <tr>
-                            <td><img height="100" width="100" src={item.imageUrl} /></td>
-                            <td><p>{item.name}: {item.years.start}-{item.years.end}</p></td>
-                            <td>
-                                <ul>
-                                    <For each={Object.entries(item.teams)}>{ty =>
-                                        <li>{ty[0]}:
-                                            <For each={ty[1]}>{yr =>
-                                                <Show
-                                                    when={yr.end - yr.start > 0}
-                                                    fallback={<span> ({yr.start})</span>}>
-                                                    <span> ({yr.start} to {yr.end})</span>
-                                                </Show>
-                                            }</For>
-                                        </li>
-                                    }
-                                    </For>
-                                </ul>
-                            </td>
-                            <Show
-                                when={item.correct == true}
-                                fallback={<td><img src="/pictures/wrong.png" width="50px" height="50px" /></td>}>
-                                <td><img src="/pictures/correct.png" width="50px" height="50px" /></td>
-                                <td><span>{item.correctTeams[0]}/{item.correctTeams[1]}</span></td>
-                            </Show>
-                        </tr>
-                    }
-                    </For>
-                </tbody>
-
             </table>
         </div >
     );

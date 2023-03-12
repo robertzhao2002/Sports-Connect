@@ -12,6 +12,42 @@ code {
     monospace;
 }
 
+button {
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px;
+}
+
+.backButton {
+  background-color: cyan;
+}
+
+.backButton:hover {
+  background-color: darkmagenta;
+}
+
+.menuButtons button {
+  background-color: yellowgreen;
+  display: block;
+}
+
+.menuButtons button:hover {
+  background-color: rgb(226, 240, 199);
+}
+
+.checkButton {
+  background-color: coral;
+}
+
+.checkButton:hover {
+  background-color: burlywood;
+}
+
+.gameContainer {
+  width: 300px;
+  margin: 0 auto;
+}
+
 #pastGuesses {
   border-collapse: collapse;
 }
@@ -42,13 +78,57 @@ code {
 
 a.buttonLink {
   background-color: navy;
-  border-radius: 8px;
-  margin: 10px;
-  padding: 8px;
   text-decoration: none;
   color: white;
 }
 
 a.buttonLink:hover {
   background-color: red;
+}
+
+.actions {
+  margin-left: 80px;
+}
+
+.actions button {
+  display: block;
+}
+
+#newGame {
+  background-color: fuchsia;
+}
+
+#newGame:hover {
+  background-color: dodgerblue;
+}
+
+#hintButton {
+  background-color: darkturquoise;
+}
+
+#hintButton:hover {
+  background-color: turquoise;
+}
+
+#solveButton {
+  background-color: lightseagreen;
+}
+
+#solveButton:hover {
+  background-color: palegreen;
+}
+
+#selectButton {
+  background-color: beige;
+}
+
+#selectButton:hover {
+  background-color: burlywood;
+}
+
+input {
+  margin-top: 15px;
+  height: 25px;
+  width: 150;
+  border-radius: 10px;
 }

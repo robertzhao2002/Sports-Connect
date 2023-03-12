@@ -108,8 +108,8 @@ export async function searchPlayer(name, mlb = true, browser = true) {
 }
 
 export async function singleSolution(teamPair, pitcher = false, inGame = false) {
-    const firstTeam = teamPair[0];
-    const secondTeam = teamPair[1];
+    const firstTeam = teamID(teamPair[0]);
+    const secondTeam = teamID(teamPair[1]);
     const unknown = { playerName: 'unknown', playerStat: 0, url: 'unknown' };
     const bestTwo = { [firstTeam]: unknown, [secondTeam]: unknown };
     const url = `https://cors-anywhere.herokuapp.com/${getUrl("baseball")}/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`

@@ -1,10 +1,15 @@
 import * as cheerio from 'cheerio';
+import { teamID } from './teams';
 
 export function bbRefId(name, number) {
     const nameSplit = name.split(/(\s+)/).filter(function (e) { return e.trim().length > 0; });;
     const givenName = nameSplit[0];
     const surname = nameSplit.slice(-1)[0];
     return [surname[0], surname.slice(0, 5) + givenName.slice(0, 2) + '0' + number];
+}
+
+function getUrl(sportName) {
+    return `https://www.${sportName}-reference.com/`;
 }
 
 export async function searchPlayer(name, mlb = true, browser = true) {
@@ -17,7 +22,7 @@ export async function searchPlayer(name, mlb = true, browser = true) {
     while (true && count <= 15) {
         try { //
             const [firstLetter, nameID] = bbRefId(name, count);
-            const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}https://www.${sportName}-reference.com/players/${firstLetter}/${nameID}.${ext}`;
+            const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}${getUrl(sportName)}/players/${firstLetter}/${nameID}.${ext}`;
             console.log(url);
             const response = await fetch(url);
             console.log(response.status);
@@ -105,9 +110,9 @@ export async function searchPlayer(name, mlb = true, browser = true) {
 export async function singleSolution(teamPair, pitcher = false, inGame = false) {
     const firstTeam = teamPair[0];
     const secondTeam = teamPair[1];
-    const unknown = { playerName: 'unknown', playerStat: 0 };
+    const unknown = { playerName: 'unknown', playerStat: 0, url: 'unknown' };
     const bestTwo = { [firstTeam]: unknown, [secondTeam]: unknown };
-    const url = `https://cors-anywhere.herokuapp.com/https://www.baseball-reference.com/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
+    const url = `https://cors-anywhere.herokuapp.com/${getUrl("baseball")}/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
     const response = await fetch(url);
     console.log(response.status);
     if (response.status == 200) {
@@ -118,16 +123,21 @@ export async function singleSolution(teamPair, pitcher = false, inGame = false) 
             const statKey1 = pitcher ? `${firstTeam}_IP` : `${firstTeam}_HR`
             const statKey2 = pitcher ? `${secondTeam}_IP` : `${secondTeam}_HR`
             const name = $(element).find('th > a').text().trim();
+            const urlSuffix = $(element).find('th > a').attr("href");
             const statRaw1 = $(element).find(`td[data-stat=${statKey1}]`).text().trim();
             const statRaw2 = $(element).find(`td[data-stat=${statKey2}]`).text().trim();
             const stat1 = (statRaw1.length == 0) ? 0 : parseFloat(statRaw1);
             const stat2 = (statRaw2.length == 0) ? 0 : parseFloat(statRaw2);
-            if (stat1 >= bestTwo[firstTeam].playerStat) bestTwo[firstTeam] = { playerName: name, playerStat: stat1 };
-            if (stat2 >= bestTwo[secondTeam].playerStat) bestTwo[secondTeam] = { playerName: name, playerStat: stat2 };
+            if (stat1 >= bestTwo[firstTeam].playerStat) bestTwo[firstTeam] = {
+                playerName: name, playerStat: stat1, url: `${getUrl("baseball")}${urlSuffix}`
+            };
+            if (stat2 >= bestTwo[secondTeam].playerStat) bestTwo[secondTeam] = {
+                playerName: name, playerStat: stat2, url: `${getUrl("baseball")}${urlSuffix}`
+            };
         });
     }
-    const result = Object.values(bestTwo).map(p => p.playerName);
-    // console.log(result);
+    const result = Object.values(bestTwo).map(p => `${p.playerName}..${p.url}`);
+    console.log(result);
     // console.log(bestTwo);
     if (inGame) return result[0];
     return new Set(result);
@@ -137,9 +147,10 @@ export async function possibleSolution(teams) {
     const solution = {};
     for (var i = 0; i < teams.length; i++) {
         const teamPair = teams[i].split(',');
+        const teamPairQuery = [teamID(teamPair[0]), teamID(teamPair[1])];
         solution[teamPair] = { hitters: null, pitchers: null };
-        solution[teamPair].hitters = await singleSolution(teamPair, false);
-        solution[teamPair].pitchers = await singleSolution(teamPair, true);
+        solution[teamPair].hitters = await singleSolution(teamPairQuery, false);
+        solution[teamPair].pitchers = await singleSolution(teamPairQuery, true);
     }
     return solution;
 }

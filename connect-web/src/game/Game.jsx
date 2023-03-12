@@ -1,5 +1,5 @@
 import '../index.css';
-import { searchPlayer, singleSolution } from './search.js';
+import { possibleSolution, searchPlayer, singleSolution } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
 
@@ -20,6 +20,7 @@ function createGame(MLB, length) {
         score: 0,
         board: getMatrix(teams),
         grid: createGrid(teams, length),
+        solution: null
     };
 }
 
@@ -42,11 +43,17 @@ function gridCopy(g) {
     return result;
 }
 
+function solutionCopy(s) {
+    const copy = Object.assign(s);
+    return copy;
+}
+
 function gameCopy(g) {
     return {
         score: g.score,
         board: boardCopy(g.board),
-        grid: gridCopy(g.grid)
+        grid: gridCopy(g.grid),
+        solution: (g.solution == null) ? null : solutionCopy(g.solution)
     };
 }
 
@@ -107,6 +114,7 @@ export function ConnectGame(MLB, length) {
     const [player, setPlayer] = createSignal("");
     const [searchResult, setSearchResult] = createSignal([]);
     const leagueString = (MLB) ? "mlb" : "nba";
+
     const checkResult = function (item) {
         const wrong = { league: leagueString, correct: false };
         const correct = { league: leagueString, correct: true, correctTeams: null };
@@ -119,7 +127,7 @@ export function ConnectGame(MLB, length) {
                 console.log(answer);
                 gameSignal().board[teams].player = item.name
                 gameSignal().grid[row + 1][col + 1] = item.imageUrl;
-                gameSignal().score++;
+                gameSignal().score = gameSignal().score + 1;
                 setGameSignal(gameCopy(gameSignal()));
                 console.log("Correct");
                 console.log(gameSignal());
@@ -180,6 +188,11 @@ export function ConnectGame(MLB, length) {
         event.preventDefault();
         batch(() => {
             console.log("solving...");
+            possibleSolution(Object.keys(gameSignal().board)).then(function (result) {
+                console.log(result);
+                gameSignal().solution = result;
+                setGameSignal(gameCopy(gameSignal()));
+            });
         });
     }
     return (
@@ -188,41 +201,72 @@ export function ConnectGame(MLB, length) {
                 when={gameSignal().score == maxScore}>
                 <h1>You Win!</h1>
             </Show>
-
-            <table>
-                <tbody>
-                    <For each={gameSignal().grid}>{teams =>
-                        <tr><For each={teams}>{item =>
-                            <Show
-                                when={item != null}
-                                fallback={<td><spacer width="125px" height="125px" /></td>}
-                            >
+            <Show
+                when={gameSignal().solution != null}>
+                <For each={Object.keys(gameSignal().board)}>{teams =>
+                    <div>
+                        <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
+                        <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
+                        <span>Hitters:
+                            <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
+                                const [name, url] = solutionString.split('..');
+                                return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                            }}
+                            </For>
+                        </span>
+                        <br />
+                        <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
+                        <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
+                        <span>Pitchers:
+                            <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
+                                const [name, url] = solutionString.split('..');
+                                return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                            }}
+                            </For>
+                        </span>
+                        <br />
+                    </div>
+                }
+                </For>
+            </Show>
+            <Show when={gameSignal().solution == null}>
+                <table>
+                    <tbody>
+                        <For each={gameSignal().grid}>{teams =>
+                            <tr><For each={teams}>{item =>
                                 <Show
-                                    when={item.length > 3}
-                                    fallback={
-                                        <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="125px" height="125px" /></td>
-                                    }>
-                                    <td><img src={item} width="125px" height="125px" /></td>
+                                    when={item != null}
+                                    fallback={<td><spacer width="125px" height="125px" /></td>}
+                                >
+                                    <Show
+                                        when={item.length > 3}
+                                        fallback={
+                                            <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="125px" height="125px" /></td>
+                                        }>
+                                        <td><img src={item} width="125px" height="125px" /></td>
+                                    </Show>
                                 </Show>
-                            </Show>
-                        }</For></tr>
-                    }</For>
-                </tbody>
-            </table>
-            <form onSubmit={submit}>
-                <input
-                    placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
-                    value={inputField()}
-                    onInput={(e) => setInputField(e.currentTarget.value)}
-                    required
-                />
-                <button type="submit">Check</button>
-            </form>
+                            }</For></tr>
+                        }</For>
+                    </tbody>
+                </table>
+            </Show>
+            <Show when={gameSignal().solution == null}>
+                <form onSubmit={submit}>
+                    <input
+                        placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
+                        value={inputField()}
+                        onInput={(e) => setInputField(e.currentTarget.value)}
+                        required
+                    />
+                    <button type="submit">Check</button>
+                </form>
+            </Show>
             <br />
             <br />
             <button onClick={newGame}>New</button>
             <Show
-                when={MLB == true}>
+                when={MLB == true && gameSignal().solution == null && gameSignal().score != maxScore}>
                 <br />
                 <br />
                 <button onClick={hint}>Hint</button>

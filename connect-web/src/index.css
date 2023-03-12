@@ -39,3 +39,16 @@ code {
   height: 300px;
   overflow-y: scroll;
 }
+
+a.buttonLink {
+  background-color: navy;
+  border-radius: 8px;
+  margin: 10px;
+  padding: 8px;
+  text-decoration: none;
+  color: white;
+}
+
+a.buttonLink:hover {
+  background-color: red;
+}

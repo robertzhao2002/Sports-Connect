@@ -28,7 +28,6 @@ export function randomTeams(length, mlb = true) {
 
 export function checkTeamRenameMLB(gameTeamCode) {
     switch (gameTeamCode) {
-
         case 'ATL': return new Set([gameTeamCode, 'BSN', 'MLN']);
         case 'BAL': return new Set([gameTeamCode, 'MLA', 'SLB']);
         case 'LAA': return new Set(['ANA', 'CAL', gameTeamCode]);
@@ -42,6 +41,15 @@ export function checkTeamRenameMLB(gameTeamCode) {
         case 'TEX': return new Set([gameTeamCode, 'WSA']);
         case 'WSN': return new Set(['MON', gameTeamCode]);
         default: return new Set([gameTeamCode]);
+    }
+}
+
+export function teamID(gameTeamCode) {
+    switch (gameTeamCode) {
+        case 'MIA': return 'FLA';
+        case 'LAA': return 'ANA';
+        case 'TBR': return 'TBD';
+        default: return gameTeamCode;
     }
 }
 

@@ -44,8 +44,14 @@ button {
 }
 
 .gameContainer {
-  width: 300px;
+  width: 400px;
   margin: 0 auto;
+}
+
+td {
+  text-align: center;
+  padding: 3px;
+  word-wrap: break-word;
 }
 
 #pastGuesses {
@@ -61,13 +67,22 @@ button {
 }
 
 .pastGuessesCol {
-  display: flex;
   align-items: center;
-  padding: 3px;
 }
 
 .pastGuessesCol img {
   padding: 3px;
+}
+
+.teamYearEntry {
+  vertical-align: middle;
+  padding: 3px;
+}
+
+.teamYearEntry img {
+  position: relative;
+  top: 50%;
+  transform: translateY(+25%);
 }
 
 #pastGuesses tbody {

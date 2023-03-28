@@ -165,22 +165,6 @@ input {
   background-color: antiquewhite;
 }
 
-#mlbButton {
-  background-color: lavender;
-}
-
-#mlbButton:hover {
-  background-color: blueviolet;
-}
-
-#nbaButton {
-  background-color: lightpink;
-}
-
-#nbaButton:hover {
-  background-color: darkorchid;
-}
-
 #resetCustom {
   background-color: deeppink;
 }

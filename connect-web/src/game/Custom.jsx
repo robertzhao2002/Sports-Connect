@@ -71,8 +71,8 @@ function NBATeams() {
 function SelectTeams() {
     return (<div align="center">
         <h1>Pick Your Teams!</h1>
-        <button id="mlbButton" onClick={() => changeMode("mlb")}>MLB</button>
-        <button id="nbaButton" onClick={() => changeMode("nba")}>NBA</button>
+        <button style={`background-color: ${(sportSignal() == "mlb") ? "darkorchid" : "beige"}`} onClick={() => changeMode("mlb")}>MLB</button>
+        <button style={`background-color: ${(sportSignal() == "nba") ? "darkorchid" : "beige"}`} onClick={() => changeMode("nba")}>NBA</button>
         <Show when={sportSignal() == "mlb"}>
             <MLBTeams />
         </Show>
@@ -80,8 +80,8 @@ function SelectTeams() {
             <NBATeams />
         </Show>
         <div>
-            <button style={`background-color: ${(rowMode()) ? "cadetblue" : ""}`} onClick={() => setRowMode(true)}>Row Teams</button>
-            <button style={`background-color: ${(rowMode()) ? "" : "cadetblue"}`} onClick={() => setRowMode(false)}>Column Teams</button>
+            <button style={`background-color: ${(rowMode()) ? "cadetblue" : "beige"}`} onClick={() => setRowMode(true)}>Row Teams</button>
+            <button style={`background-color: ${(rowMode()) ? "beige" : "cadetblue"}`} onClick={() => setRowMode(false)}>Column Teams</button>
         </div>
         <Show when={teamsSelected().length >= 1}>
             <button id="resetCustom" onclick={() => resetCustomGame()}>Reset</button>

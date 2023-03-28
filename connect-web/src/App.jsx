@@ -78,6 +78,7 @@ function back(event) {
   event.preventDefault();
   batch(() => {
     setGameState({ state: State.Loading })
+    resetCustomGame();
   });
 }
 

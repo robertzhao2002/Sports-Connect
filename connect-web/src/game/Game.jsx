@@ -2,26 +2,32 @@ import '../index.css';
 import { possibleSolution, searchPlayer, singleSolution } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
+import { setCustomGameState, CurrentCustomGameState, resetCustomGame } from './Custom';
 
 export const [pastGuesses, setPastGuesses] = createSignal([]);
 const [numCorrect, setNumCorrect] = createSignal(0);
-function createGrid(teams, length) {
-    const showGrid = new Array(length + 1);
+
+export function createGrid(rowTeams, colTeams) {
+    const showGrid = new Array(rowTeams.length + 1);
     for (var i = 1; i < showGrid.length; i++) {
-        showGrid[i] = [teams[i - 1]].concat(Array(length).fill(null));
+        showGrid[i] = [rowTeams[i - 1]].concat(Array(length).fill(null));
     }
-    showGrid[0] = [null].concat(teams.slice(length, 2 * length));
+    showGrid[0] = [null].concat(colTeams);
     return showGrid;
 }
 
-function createGame(MLB, length) {
-    const teams = randomTeams(length * 2, MLB);
+function createGame(rowTeams, colTeams) {
     return {
         score: 0,
-        board: getMatrix(teams),
-        grid: createGrid(teams, length),
+        board: getMatrix(rowTeams, colTeams),
+        grid: createGrid(rowTeams, colTeams),
         solution: null
     };
+}
+
+function createRandomGame(mode, length) {
+    const teams = randomTeams(length * 2, mode);
+    return createGame(teams.slice(0, length), teams.slice(length, teams.length));
 }
 
 function boardCopy(b) {
@@ -113,9 +119,9 @@ export function PastGuesses() {
     </div>);
 }
 
-export function ConnectGame(MLB, length) {
-    const maxScore = length * length;
-    const game = createGame(MLB, length);
+export function ConnectGame(MLB, length, customTeams = null, customMode = false) {
+    const maxScore = (customTeams == null) ? length * length : customTeams[0].length * customTeams[1].length;
+    const game = (customTeams == null) ? createRandomGame(MLB, length) : createGame(customTeams[0], customTeams[1]);
     const [gameSignal, setGameSignal] = createSignal(game);
     const [inputField, setInputField] = createSignal("");
     const [player, setPlayer] = createSignal("");
@@ -173,7 +179,12 @@ export function ConnectGame(MLB, length) {
     const newGame = (event) => {
         event.preventDefault();
         batch(() => {
-            setGameSignal(createGame(MLB, length));
+            if (customMode) {
+                setCustomGameState({ state: CurrentCustomGameState.Loading });
+                resetCustomGame();
+            } else {
+                setGameSignal(createRandomGame(MLB, length));
+            }
         });
     }
 
@@ -272,7 +283,7 @@ export function ConnectGame(MLB, length) {
                         <button type="submit" class="checkButton">Check 🔍</button>
                     </form>
                 </Show>
-                <button onClick={newGame} id="newGame">New 🔀</button>
+                <button onClick={newGame} id="newGame">New {(customMode) ? "Custom Game " : ""}🔀</button>
                 <Show
                     when={MLB == true && gameSignal().solution == null && gameSignal().score != maxScore}>
 

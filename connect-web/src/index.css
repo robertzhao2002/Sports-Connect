@@ -147,3 +147,52 @@ input {
   width: 150;
   border-radius: 10px;
 }
+
+.customImg {
+  padding: 10px;
+  display: inline-block;
+}
+
+.customImg-disabled {
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+  display: inline-block;
+  padding: 10px;
+  pointer-events: none;
+}
+
+.customImg:hover {
+  background-color: antiquewhite;
+}
+
+#mlbButton {
+  background-color: lavender;
+}
+
+#mlbButton:hover {
+  background-color: blueviolet;
+}
+
+#nbaButton {
+  background-color: lightpink;
+}
+
+#nbaButton:hover {
+  background-color: darkorchid;
+}
+
+#resetCustom {
+  background-color: deeppink;
+}
+
+#resetCustom:hover {
+  background-color: mediumvioletred;
+}
+
+#startCustom {
+  background-color: gold;
+}
+
+#startCustom:hover {
+  background-color: violet;
+}

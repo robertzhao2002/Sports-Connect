@@ -1,6 +1,7 @@
 import { batch, createSignal, Show } from "solid-js";
 import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge } from "./game/Modes";
 import { pastGuesses, PastGuesses } from "./game/Game";
+import { CustomGame, CurrentCustomGameState, setCustomGameState, resetCustomGame } from "./game/Custom";
 
 const [gameState, setGameState] = createSignal({ state: "Loading" });
 const State = {
@@ -14,6 +15,10 @@ const State = {
     Mini: "NBAMini",
     Medium: "NBAMedium",
     Large: "NBALarge"
+  },
+  Custom: {
+    Board: "CustomBoard",
+    One: "CustomOne"
   }
 }
 
@@ -57,6 +62,15 @@ function startNBALarge(event) {
   event.preventDefault();
   batch(() => {
     setGameState({ state: State.NBA.Large })
+  });
+}
+
+function startSelectingTeams(event) {
+  event.preventDefault();
+  batch(() => {
+    setGameState({ state: State.Custom.Board })
+    setCustomGameState({ state: CurrentCustomGameState.Loading })
+    resetCustomGame()
   });
 }
 
@@ -114,6 +128,13 @@ function App() {
         </div>
       </Show>
       <Show
+        when={gameState().state == State.Custom.Board}>
+        <div class="gameContainer">
+          <button class="backButton" onClick={back}>Back</button>
+          <CustomGame />
+        </div>
+      </Show>
+      <Show
         when={gameState().state == State.Loading}>
         <div align="center">
           <h1>Welcome to Sports Connect!</h1>
@@ -127,6 +148,8 @@ function App() {
             <button onClick={startNBAMedium}>NBA Medium (2x2)</button>
             <button onClick={startNBALarge}>NBA Large (3x3)</button>
             <button>NBA XL (Coming Soon ...) </button>
+            <button onClick={startSelectingTeams}>Custom Mode</button>
+            <button >Single (Coming Soon ...) </button>
           </div>
           <div>
             <h2>Before you start, you need to activate a CORS Proxy to query Sports Reference</h2>

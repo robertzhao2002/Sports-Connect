@@ -1,6 +1,6 @@
 import sample from '@stdlib/random-sample';
 
-const MLBTEAMS = [
+export const MLBTEAMS = [
     'ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW',
     'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR',
     'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM',
@@ -8,7 +8,7 @@ const MLBTEAMS = [
     'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN'
 ] // Based on names of logos
 
-const NBATEAMS = [
+export const NBATEAMS = [
     'ATL', 'BOS', 'BRK', 'CHI', 'CHO', 'CLE',
     'DAL', 'DEN', 'DET', 'GSW', 'HOU', 'IND',
     'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN',
@@ -77,12 +77,11 @@ export function checkTeamRenameNBA(gameTeamCode) {
     }
 }
 
-export function getMatrix(teams) {
-    const length = teams.length / 2;
+export function getMatrix(rowTeams, colTeams) {
     const board = {};
-    for (var i = 0; i < length; i++) {
-        for (var j = length; j < 2 * length; j++) {
-            board[[teams[i], teams[j]]] = { coordinates: [i, j - length], player: null }
+    for (var i = 0; i < rowTeams.length; i++) {
+        for (var j = 0; j < colTeams.length; j++) {
+            board[[rowTeams[i], colTeams[j]]] = { coordinates: [i, j], player: null }
         }
     }
     return board;

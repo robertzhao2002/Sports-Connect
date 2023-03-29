@@ -222,31 +222,35 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
             </Show>
             <Show
                 when={gameSignal().solution != null}>
-                <For each={Object.keys(gameSignal().board)}>{teams =>
-                    <div class="solutionPair">
-                        <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
-                        <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
-                        <h1>Hitters</h1>
-                        <span>
-                            <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
-                                const [name, url] = solutionString.split('..');
-                                return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                            }}
-                            </For>
-                        </span>
-                        <br />
-                        <h1>Pitchers</h1>
-                        <span>
-                            <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
-                                const [name, url] = solutionString.split('..');
-                                return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                            }}
-                            </For>
-                        </span>
-                        <br />
-                    </div>
-                }
-                </For>
+                <h1 style="margin-left: 50px">Possible Solutions</h1>
+                <div class="solutionPairContainer">
+                    <For each={Object.keys(gameSignal().board)}>{teams =>
+                        <div class="solutionPair">
+                            <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
+                            <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
+                            <h1>Hitters</h1>
+                            <span>
+                                <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
+                                    const [name, url] = solutionString.split('..');
+                                    return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                }}
+                                </For>
+                            </span>
+                            <br />
+                            <h1>Pitchers</h1>
+                            <span>
+                                <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
+                                    const [name, url] = solutionString.split('..');
+                                    return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                }}
+                                </For>
+                            </span>
+                            <br />
+                        </div>
+                    }
+                    </For>
+
+                </div>
             </Show>
             <Show when={gameSignal().solution == null}>
                 <table>

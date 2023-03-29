@@ -1,5 +1,5 @@
 import '../index.css';
-import { possibleSolution, searchPlayer, singleSolution } from './search.js';
+import { possibleSolution, searchPlayer, getHint } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
 import { setCustomGameState, CurrentCustomGameState, resetCustomGame } from './Custom';
@@ -194,7 +194,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
             for (const e of Object.entries(gameSignal().board)) {
                 const [teams, answer] = e;
                 if (answer.player == null) {
-                    singleSolution(teams.split(','), false, true).then(function (result) {
+                    getHint(teams.split(','), true).then(function (result) {
                         alert(result.split('..')[0]);
                     });
                     break;
@@ -223,10 +223,11 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
             <Show
                 when={gameSignal().solution != null}>
                 <For each={Object.keys(gameSignal().board)}>{teams =>
-                    <div>
+                    <div class="solutionPair">
                         <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
                         <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
-                        <span>Hitters:
+                        <h1>Hitters</h1>
+                        <span>
                             <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
                                 const [name, url] = solutionString.split('..');
                                 return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
@@ -234,9 +235,8 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                             </For>
                         </span>
                         <br />
-                        <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
-                        <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
-                        <span>Pitchers:
+                        <h1>Pitchers</h1>
+                        <span>
                             <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
                                 const [name, url] = solutionString.split('..');
                                 return (<a href={url} target="_blank" class="buttonLink">{name}</a>);

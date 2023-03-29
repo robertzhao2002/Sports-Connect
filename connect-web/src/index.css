@@ -92,13 +92,23 @@ td {
 }
 
 a.buttonLink {
+  padding: 10px;
+  border-radius: 10px;
   background-color: navy;
+  margin: 5px;
   text-decoration: none;
   color: white;
+  display: block;
 }
 
 a.buttonLink:hover {
   background-color: red;
+}
+
+.solutionPair {
+  background-color: azure;
+  border-radius: 8px;
+  margin: 5px;
 }
 
 .actions {

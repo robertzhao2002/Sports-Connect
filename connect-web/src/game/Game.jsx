@@ -71,7 +71,7 @@ export function PastGuesses() {
             }
         </h1>
         <table id="pastGuesses">
-            <tbody>
+            <tbody class="scrollMenu">
                 <For each={pastGuesses()}>{item =>
                     <tr>
                         <td>
@@ -126,6 +126,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
     const [inputField, setInputField] = createSignal("");
     const [player, setPlayer] = createSignal("");
     const [searchResult, setSearchResult] = createSignal([]);
+    const [isLoading, setIsLoading] = createSignal(false);
     const leagueString = (MLB) ? "mlb" : "nba";
 
     const checkResult = function (item) {
@@ -160,9 +161,11 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
     const submit = (event) => {
         event.preventDefault();
         batch(() => {
+            setIsLoading(true);
             setPlayer(inputField());
             console.log(player());
             searchPlayer(player().toLowerCase(), MLB, true).then(function (result) {
+                setIsLoading(false);
                 if (result == null) {
                     alert("bad input");
                 } else if (result.length > 1) {
@@ -191,7 +194,9 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
     const hint = (event) => {
         event.preventDefault();
         batch(() => {
+            setIsLoading(true);
             for (const e of Object.entries(gameSignal().board)) {
+                setIsLoading(false);
                 const [teams, answer] = e;
                 if (answer.player == null) {
                     getHint(teams.split(','), true).then(function (result) {
@@ -207,7 +212,9 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
         event.preventDefault();
         batch(() => {
             console.log("solving...");
+            setIsLoading(true);
             possibleSolution(Object.keys(gameSignal().board)).then(function (result) {
+                setIsLoading(false);
                 console.log(result);
                 gameSignal().solution = result;
                 setGameSignal(gameCopy(gameSignal()));
@@ -215,15 +222,19 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
         });
     }
     return (
-        <div align="center">
+        <div align="center" class={(isLoading()) ? "disabledComponent" : ""}>
             <Show
                 when={gameSignal().score == maxScore}>
                 <h1>You Win!</h1>
             </Show>
             <Show
+                when={isLoading()}>
+                <h2 style="color: black">Searching ...</h2>
+            </Show>
+            <Show
                 when={gameSignal().solution != null}>
                 <h1 style="margin-left: 50px">Possible Solutions</h1>
-                <div class="solutionPairContainer">
+                <div class="solutionPairContainer scrollMenu">
                     <For each={Object.keys(gameSignal().board)}>{teams =>
                         <div class="solutionPair">
                             <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />

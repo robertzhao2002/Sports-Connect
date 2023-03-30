@@ -12,6 +12,16 @@ code {
     monospace;
 }
 
+.disabledComponent {
+  pointer-events: none;
+  opacity: 0.3;
+  filter: alpha(opacity=30);
+}
+
+.scrollMenu {
+  overflow-y: scroll;
+}
+
 .menuCard {
   padding: 8px;
   border-radius: 10px;
@@ -122,7 +132,6 @@ td {
 #pastGuesses tbody {
   display: inline-block;
   height: 300px;
-  overflow-y: scroll;
 }
 
 a.buttonLink {
@@ -148,7 +157,6 @@ a.buttonLink:hover {
 .solutionPairContainer {
   margin-left: 50px;
   height: 500px;
-  overflow-y: scroll;
 }
 
 .actions {

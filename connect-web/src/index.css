@@ -12,6 +12,49 @@ code {
     monospace;
 }
 
+.menuCard {
+  padding: 8px;
+  border-radius: 10px;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.mlbGames {
+  background-color: burlywood;
+}
+
+.mlbGames button {
+  background-color: dodgerblue;
+}
+
+.mlbGames button:hover {
+  background-color: darkviolet;
+}
+
+.nbaGames {
+  background-color: lightcoral;
+}
+
+.nbaGames button {
+  background-color: royalblue;
+}
+
+.nbaGames button:hover {
+  background-color: blue;
+}
+
+.customGames {
+  background-color: floralwhite;
+}
+
+.customGames button {
+  background-color: mediumorchid;
+}
+
+.customGames button:hover {
+  background-color: mediumblue;
+}
+
 button {
   border-radius: 10px;
   padding: 10px;
@@ -24,15 +67,6 @@ button {
 
 .backButton:hover {
   background-color: darkmagenta;
-}
-
-.menuButtons button {
-  background-color: yellowgreen;
-  display: block;
-}
-
-.menuButtons button:hover {
-  background-color: rgb(226, 240, 199);
 }
 
 .checkButton {

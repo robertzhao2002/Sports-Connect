@@ -137,18 +137,25 @@ function App() {
       </Show>
       <Show
         when={gameState().state == State.Loading}>
-        <div align="center">
+        <div align="center" class="gameMnu">
           <h1>Welcome to Sports Connect!</h1>
           <h2>Connect the teams by naming a player that played for both teams!</h2>
-          <div class="menuButtons">
-            <button onClick={startMLBMini}>MLB Mini (1x1)</button>
-            <button onClick={startMLBMedium}>MLB Medium (2x2)</button>
-            <button onClick={startMLBLarge}>MLB Large (3x3)</button>
-            <button>MLB XL (Coming Soon ...) </button>
-            <button onClick={startNBAMini}>NBA Mini (1x1)</button>
-            <button onClick={startNBAMedium}>NBA Medium (2x2)</button>
-            <button onClick={startNBALarge}>NBA Large (3x3)</button>
-            <button>NBA XL (Coming Soon ...) </button>
+          <div class="mlbGames menuCard">
+            <h2>MLB Mode</h2>
+            <button onClick={startMLBMini}>Mini (1x1)</button>
+            <button onClick={startMLBMedium}>Medium (2x2)</button>
+            <button onClick={startMLBLarge}>Large (3x3)</button>
+            <button>XL (Coming Soon ...) </button>
+          </div>
+          <div class="nbaGames menuCard">
+            <h2>NBA Mode</h2>
+            <button onClick={startNBAMini}>Mini (1x1)</button>
+            <button onClick={startNBAMedium}>Medium (2x2)</button>
+            <button onClick={startNBALarge}>Large (3x3)</button>
+            <button>XL (Coming Soon ...) </button>
+          </div>
+          <div class="customGames menuCard">
+            <h2>Other Game Modes</h2>
             <button onClick={startSelectingTeams}>Custom Mode</button>
             <button >Single (Coming Soon ...) </button>
           </div>

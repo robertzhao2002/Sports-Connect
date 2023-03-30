@@ -142,17 +142,31 @@ function App() {
           <h2>Connect the teams by naming a player that played for both teams!</h2>
           <div class="mlbGames menuCard">
             <h2>MLB Mode</h2>
-            <button onClick={startMLBMini}>Mini (1x1)</button>
-            <button onClick={startMLBMedium}>Medium (2x2)</button>
-            <button onClick={startMLBLarge}>Large (3x3)</button>
-            <button>XL (Coming Soon ...) </button>
+            <button onClick={startMLBMini}><img height="20px" width="20px" src="/pictures/mlb.png" /></button>
+            <button onClick={startMLBMedium}>
+              <img height="20px" width="20px" src="/pictures/mlb.png" />
+              <img height="20px" width="20px" src="/pictures/mlb.png" />
+            </button>
+            <button onClick={startMLBLarge}>
+              <img height="20px" width="20px" src="/pictures/mlb.png" />
+              <img height="20px" width="20px" src="/pictures/mlb.png" />
+              <img height="20px" width="20px" src="/pictures/mlb.png" />
+            </button>
           </div>
           <div class="nbaGames menuCard">
             <h2>NBA Mode</h2>
-            <button onClick={startNBAMini}>Mini (1x1)</button>
-            <button onClick={startNBAMedium}>Medium (2x2)</button>
-            <button onClick={startNBALarge}>Large (3x3)</button>
-            <button>XL (Coming Soon ...) </button>
+            <button onClick={startNBAMini}>
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+            </button>
+            <button onClick={startNBAMedium}>
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+            </button>
+            <button onClick={startNBALarge}>
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+              <img height="20px" width="20px" src="/pictures/nba.png" />
+            </button>
           </div>
           <div class="customGames menuCard">
             <h2>Other Game Modes</h2>

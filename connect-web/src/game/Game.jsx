@@ -105,7 +105,6 @@ export function PastGuesses() {
                                 <img src="/pictures/correct.png" width="40px" height="40px" />
                                 <div class="teamYearEntry">
                                     <img src={`/team-logos/${item.league}/${item.correctTeams[0]}.png`} height="20" width="20" />
-                                    <span> ⇔ </span>
                                     <img src={`/team-logos/${item.league}/${item.correctTeams[1]}.png`} height="20" width="20" />
                                 </div>
                             </td>

@@ -179,12 +179,10 @@ function App() {
           </div>
         </div>
       </Show>
-
       <Show
         when={pastGuesses().length > 0}>
         <PastGuesses />
       </Show>
-
     </div>
   );
 }

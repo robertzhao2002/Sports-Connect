@@ -196,10 +196,10 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
         batch(() => {
             setIsLoading(true);
             for (const e of Object.entries(gameSignal().board)) {
-                setIsLoading(false);
                 const [teams, answer] = e;
                 if (answer.player == null) {
                     getHint(teams.split(','), true).then(function (result) {
+                        setIsLoading(false);
                         alert(result.split('..')[0]);
                     });
                     break;
@@ -222,108 +222,110 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
         });
     }
     return (
-        <div align="center" class={(isLoading()) ? "disabledComponent" : ""}>
-            <Show
-                when={gameSignal().score == maxScore}>
-                <h1>You Win!</h1>
-            </Show>
+        <div align="center" style="position: relative">
             <Show
                 when={isLoading()}>
-                <h2 style="color: black">Searching ...</h2>
+                <div class="loaderWheel" />
             </Show>
-            <Show
-                when={gameSignal().solution != null}>
-                <h1 style="margin-left: 50px">Possible Solutions</h1>
-                <div class="solutionPairContainer scrollMenu">
-                    <For each={Object.keys(gameSignal().board)}>{teams =>
-                        <div class="solutionPair">
-                            <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
-                            <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
-                            <h1>Hitters</h1>
-                            <span>
-                                <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
-                                    const [name, url] = solutionString.split('..');
-                                    return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                                }}
-                                </For>
-                            </span>
-                            <br />
-                            <h1>Pitchers</h1>
-                            <span>
-                                <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
-                                    const [name, url] = solutionString.split('..');
-                                    return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                                }}
-                                </For>
-                            </span>
-                            <br />
-                        </div>
-                    }
-                    </For>
-
-                </div>
-            </Show>
-            <Show when={gameSignal().solution == null}>
-                <table>
-                    <tbody>
-                        <For each={gameSignal().grid}>{teams =>
-                            <tr><For each={teams}>{item =>
-                                <Show
-                                    when={item != null}
-                                    fallback={<td><spacer width="75px" height="75px" /></td>}
-                                >
-                                    <Show
-                                        when={item.length > 3}
-                                        fallback={
-                                            <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="75px" height="75px" /></td>
-                                        }>
-                                        <td><img src={item} width="75px" height="75px" /></td>
-                                    </Show>
-                                </Show>
-                            }</For></tr>
-                        }</For>
-                    </tbody>
-                </table>
-            </Show>
-            <div class="actions">
-                <Show when={gameSignal().solution == null && gameSignal().score != maxScore}>
-                    <form onSubmit={submit}>
-                        <input
-                            placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
-                            value={inputField()}
-                            onInput={(e) => setInputField(e.currentTarget.value)}
-                            required
-                        />
-                        <br />
-                        <button type="submit" class="checkButton">Check 🔍</button>
-                    </form>
-                </Show>
-                <button onClick={newGame} id="newGame">New {(customMode) ? "Custom Game " : ""}🔀</button>
+            <div class={(isLoading()) ? "disabledComponent" : ""}>
                 <Show
-                    when={MLB == true && gameSignal().solution == null && gameSignal().score != maxScore}>
-
-                    <button onClick={hint} id="hintButton">Hint 💡</button>
-                    <button onClick={solve} id="solveButton">Solve ⭐</button>
-
+                    when={gameSignal().score == maxScore}>
+                    <h1>You Win!</h1>
                 </Show>
-            </div>
-            <table>
-                <tbody>
-                    <Show
-                        when={searchResult().length >= 2}
-                    >
-                        <th align="center">Which One?</th>
-                        <For each={searchResult()}>{item =>
-                            <tr>
-                                <td><img height="100" width="100" src={item.imageUrl} /></td>
-                                <td>{item.name}: {item.years.start}-{item.years.end}</td>
-                                <td><button onClick={() => { checkResult(item); setSearchResult([]); }} id="selectButton">Select</button></td>
-                            </tr>
+                <Show
+                    when={gameSignal().solution != null}>
+                    <h1 style="margin-left: 50px">Possible Solutions</h1>
+                    <div class="solutionPairContainer scrollMenu">
+                        <For each={Object.keys(gameSignal().board)}>{teams =>
+                            <div class="solutionPair">
+                                <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
+                                <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
+                                <h1>Hitters</h1>
+                                <span>
+                                    <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
+                                        const [name, url] = solutionString.split('..');
+                                        return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                    }}
+                                    </For>
+                                </span>
+                                <br />
+                                <h1>Pitchers</h1>
+                                <span>
+                                    <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
+                                        const [name, url] = solutionString.split('..');
+                                        return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                    }}
+                                    </For>
+                                </span>
+                                <br />
+                            </div>
                         }
                         </For>
+
+                    </div>
+                </Show>
+                <Show when={gameSignal().solution == null}>
+                    <table>
+                        <tbody>
+                            <For each={gameSignal().grid}>{teams =>
+                                <tr><For each={teams}>{item =>
+                                    <Show
+                                        when={item != null}
+                                        fallback={<td><spacer width="75px" height="75px" /></td>}
+                                    >
+                                        <Show
+                                            when={item.length > 3}
+                                            fallback={
+                                                <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="75px" height="75px" /></td>
+                                            }>
+                                            <td><img src={item} width="75px" height="75px" /></td>
+                                        </Show>
+                                    </Show>
+                                }</For></tr>
+                            }</For>
+                        </tbody>
+                    </table>
+                </Show>
+                <div class="actions">
+                    <Show when={gameSignal().solution == null && gameSignal().score != maxScore}>
+                        <form onSubmit={submit}>
+                            <input
+                                placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
+                                value={inputField()}
+                                onInput={(e) => setInputField(e.currentTarget.value)}
+                                required
+                            />
+                            <br />
+                            <button type="submit" class="checkButton">Check 🔍</button>
+                        </form>
                     </Show>
-                </tbody>
-            </table>
-        </div >
+                    <button onClick={newGame} id="newGame">New {(customMode) ? "Custom Game " : ""}🔀</button>
+                    <Show
+                        when={MLB == true && gameSignal().solution == null && gameSignal().score != maxScore}>
+
+                        <button onClick={hint} id="hintButton">Hint 💡</button>
+                        <button onClick={solve} id="solveButton">Solve ⭐</button>
+
+                    </Show>
+                </div>
+                <table>
+                    <tbody>
+                        <Show
+                            when={searchResult().length >= 2}
+                        >
+                            <th align="center">Which One?</th>
+                            <For each={searchResult()}>{item =>
+                                <tr>
+                                    <td><img height="100" width="100" src={item.imageUrl} /></td>
+                                    <td>{item.name}: {item.years.start}-{item.years.end}</td>
+                                    <td><button onClick={() => { checkResult(item); setSearchResult([]); }} id="selectButton">Select</button></td>
+                                </tr>
+                            }
+                            </For>
+                        </Show>
+                    </tbody>
+                </table>
+            </div >
+        </div>
     );
 }

@@ -22,7 +22,8 @@ export async function searchPlayer(name, mlb = true, browser = true) {
     while (true && count <= 15) {
         try { //
             const [firstLetter, nameID] = bbRefId(name, count);
-            const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}${getUrl(sportName)}/players/${firstLetter}/${nameID}.${ext}`;
+            const playerRefUrl = `${getUrl(sportName)}/players/${firstLetter}/${nameID}.${ext}`;
+            const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}${playerRefUrl}`;
             console.log(url);
             const response = await fetch(url);
             console.log(response.status);
@@ -93,6 +94,7 @@ export async function searchPlayer(name, mlb = true, browser = true) {
                 searchResults.push({
                     name: playerName,
                     imageUrl: playerImgUrl,
+                    refUrl: playerRefUrl,
                     years: { start: start, end: end },
                     teams: teams
                 });

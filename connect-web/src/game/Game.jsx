@@ -77,7 +77,7 @@ export function PastGuesses() {
                         <td>
                             <img height="75" width="75" src={item.imageUrl} />
                             <br />
-                            <span>{item.name}</span>
+                            <a href={item.refUrl} target="_blank">{item.name}</a>
                             <br />
                             <span>{item.years.start}-{item.years.end}</span>
                             <br />

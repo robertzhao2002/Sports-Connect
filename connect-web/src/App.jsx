@@ -1,6 +1,6 @@
 import { batch, createSignal, Show } from "solid-js";
 import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge } from "./game/Modes";
-import { pastGuesses, PastGuesses } from "./game/Game";
+import { pastGuesses, PastGuesses } from "./History";
 import { CustomGame, CurrentCustomGameState, setCustomGameState, resetCustomGame } from "./game/Custom";
 
 const [gameState, setGameState] = createSignal({ state: "Loading" });

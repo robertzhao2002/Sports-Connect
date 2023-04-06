@@ -16,7 +16,7 @@ export const CurrentCustomGameState = {
 }
 
 function CustomGameStart() {
-    const mode = sportSignal() == "mlb";
+    const mode = sportSignal();
     return ConnectGame(
         mode,
         Math.floor(teamsSelected().length / 2),

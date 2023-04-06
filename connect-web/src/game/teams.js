@@ -1,4 +1,5 @@
 import sample from '@stdlib/random-sample';
+import { getSportValue } from './search';
 
 export const MLBTEAMS = [
     'ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW',
@@ -6,7 +7,7 @@ export const MLBTEAMS = [
     'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM',
     'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SEA',
     'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN'
-] // Based on names of logos
+]; // Based on names of logos
 
 export const NBATEAMS = [
     'ATL', 'BOS', 'BRK', 'CHI', 'CHO', 'CLE',
@@ -14,11 +15,19 @@ export const NBATEAMS = [
     'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN',
     'NOP', 'NYK', 'OKC', 'ORL', 'PHI', 'PHO',
     'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS'
-] // Based on names of logos
+]; // Based on names of logos
 
-export function randomTeams(length, mlb = true) {
+export const NFLTEAMS = [
+
+]; // Based on names of logos
+
+export function randomTeams(length, mode) {
     return sample(
-        (mlb) ? MLBTEAMS : NBATEAMS,
+        getSportValue(mode, {
+            mlb: MLBTEAMS,
+            nba: NBATEAMS,
+            nfl: NFLTEAMS
+        }),
         {
             'replace': false,
             'size': length
@@ -87,10 +96,18 @@ export function getMatrix(rowTeams, colTeams) {
     return board;
 }
 
-export function checkPlayerTeams(teams, playerTeams, mlb = true) {
+export function checkPlayerTeams(teams, playerTeams, mode) {
     const [team1, team2] = teams;
-    const otherNames1 = (mlb) ? checkTeamRenameMLB(team1) : checkTeamRenameNBA(team1);
-    const otherNames2 = (mlb) ? checkTeamRenameMLB(team2) : checkTeamRenameNBA(team2);
+    const otherNames1 = getSportValue(mode, {
+        mlb: checkTeamRenameMLB(team1),
+        nba: checkTeamRenameNBA(team1),
+        nfl: 'unknown'
+    });
+    const otherNames2 = getSportValue(mode, {
+        mlb: checkTeamRenameMLB(team2),
+        nba: checkTeamRenameNBA(team2),
+        nfl: 'unknown'
+    });
     var team1Check = false;
     var team2Check = false;
     console.log(playerTeams);

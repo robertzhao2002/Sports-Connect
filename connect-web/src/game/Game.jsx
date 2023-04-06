@@ -1,8 +1,8 @@
 import '../index.css';
-import { possibleSolution, searchPlayer, getHint } from './search.js';
+import { possibleSolution, searchPlayer, getHint, getSportValue } from './search.js';
 import { checkPlayerTeams, getMatrix, randomTeams } from './teams.js';
 import { batch, createSignal, Show } from "solid-js";
-import { pastGuesses, setPastGuesses } from '../History';
+import { pastGuesses, setPastGuesses } from './History';
 import { setCustomGameState, CurrentCustomGameState, resetCustomGame } from './Custom';
 
 export const [numCorrect, setNumCorrect] = createSignal(0);
@@ -63,24 +63,23 @@ function gameCopy(g) {
     };
 }
 
-export function ConnectGame(MLB, length, customTeams = null, customMode = false) {
+export function ConnectGame(mode, length, customTeams = null, customMode = false) {
     const maxScore = (customTeams == null) ? length * length : customTeams[0].length * customTeams[1].length;
-    const game = (customTeams == null) ? createRandomGame(MLB, length) : createGame(customTeams[0], customTeams[1]);
+    const game = (customTeams == null) ? createRandomGame(mode, length) : createGame(customTeams[0], customTeams[1]);
     const [gameSignal, setGameSignal] = createSignal(game);
     const [inputField, setInputField] = createSignal("");
     const [player, setPlayer] = createSignal("");
     const [searchResult, setSearchResult] = createSignal([]);
     const [isLoading, setIsLoading] = createSignal(false);
-    const leagueString = (MLB) ? "mlb" : "nba";
 
     const checkResult = function (item) {
-        const wrong = { league: leagueString, correct: false };
-        const correct = { league: leagueString, correct: true, correctTeams: null };
+        const wrong = { league: mode, correct: false };
+        const correct = { league: mode, correct: true, correctTeams: null };
         for (const e of Object.entries(gameSignal().board)) {
             const [teams, answer] = e;
             const teamList = teams.split(',');
             console.log(answer);
-            if (checkPlayerTeams(teamList, item.teams, MLB) && answer.player == null) {
+            if (checkPlayerTeams(teamList, item.teams, mode) && answer.player == null) {
                 const [row, col] = answer.coordinates;
                 console.log(answer);
                 gameSignal().board[teams].player = item.name
@@ -108,7 +107,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
             setIsLoading(true);
             setPlayer(inputField());
             console.log(player());
-            searchPlayer(player().toLowerCase(), MLB, true).then(function (result) {
+            searchPlayer(player().toLowerCase(), mode, true).then(function (result) {
                 setIsLoading(false);
                 if (result == null) {
                     alert("bad input");
@@ -130,7 +129,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                 setCustomGameState({ state: CurrentCustomGameState.Loading });
                 resetCustomGame();
             } else {
-                setGameSignal(createRandomGame(MLB, length));
+                setGameSignal(createRandomGame(mode, length));
             }
         });
     }
@@ -182,8 +181,8 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                     <div class="solutionPairContainer scrollMenu">
                         <For each={Object.keys(gameSignal().board)}>{teams =>
                             <div class="solutionPair">
-                                <img src={`/team-logos/${leagueString}/${teams.split(',')[0]}.png`} height="50" width="50" />
-                                <img src={`/team-logos/${leagueString}/${teams.split(',')[1]}.png`} height="50" width="50" />
+                                <img src={`/team-logos/${mode}/${teams.split(',')[0]}.png`} height="50" width="50" />
+                                <img src={`/team-logos/${mode}/${teams.split(',')[1]}.png`} height="50" width="50" />
                                 <h1>Hitters</h1>
                                 <span>
                                     <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
@@ -220,7 +219,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                                         <Show
                                             when={item.length > 3}
                                             fallback={
-                                                <td><img src={`/team-logos/${(MLB) ? 'mlb' : 'nba'}/${item}.png`} width="75px" height="75px" /></td>
+                                                <td><img src={`/team-logos/${mode}/${item}.png`} width="75px" height="75px" /></td>
                                             }>
                                             <td><img src={item} width="75px" height="75px" /></td>
                                         </Show>
@@ -234,7 +233,11 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                     <Show when={gameSignal().solution == null && gameSignal().score != maxScore}>
                         <form onSubmit={submit}>
                             <input
-                                placeholder={(MLB) ? 'Derek Jeter' : 'Kobe Bryant'}
+                                placeholder={getSportValue(mode, {
+                                    mlb: 'Derek Jeter',
+                                    nba: 'Kobe Bryant',
+                                    nfl: 'Calvin Johnson'
+                                })}
                                 value={inputField()}
                                 onInput={(e) => setInputField(e.currentTarget.value)}
                                 required
@@ -245,7 +248,7 @@ export function ConnectGame(MLB, length, customTeams = null, customMode = false)
                     </Show>
                     <button onClick={newGame} id="newGame">New {(customMode) ? "Custom Game " : ""}🔀</button>
                     <Show
-                        when={MLB == true && gameSignal().solution == null && gameSignal().score != maxScore}>
+                        when={mode == 'mlb' && gameSignal().solution == null && gameSignal().score != maxScore}>
 
                         <button onClick={hint} id="hintButton">Hint 💡</button>
                         <button onClick={solve} id="solveButton">Solve ⭐</button>

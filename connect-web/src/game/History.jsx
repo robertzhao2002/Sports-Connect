@@ -1,5 +1,5 @@
 import { createSignal } from "solid-js";
-import { numCorrect } from "./game/Game";
+import { numCorrect } from "./Game";
 
 export const [pastGuesses, setPastGuesses] = createSignal([]);
 

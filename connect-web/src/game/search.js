@@ -2,10 +2,75 @@ import * as cheerio from 'cheerio';
 import { teamID } from './teams';
 
 export function bbRefId(name, number) {
-    const nameSplit = name.split(/(\s+)/).filter(function (e) { return e.trim().length > 0; });;
+    const nameSplit = name.split(/(\s+)/).filter(function (e) { return e.trim().length > 0; });
     const givenName = nameSplit[0];
     const surname = nameSplit.slice(-1)[0];
     return [surname[0], surname.slice(0, 5) + givenName.slice(0, 2) + '0' + number];
+}
+
+export function pfRefId(name, number) {
+    const nameSplit = name.split(/(\s+)/).filter(function (e) { return e.trim().length > 0; });
+    const givenName = nameSplit[0].slice(0, 2);
+    const surname = nameSplit.slice(-1)[0].slice(0, 4);
+    return [
+        surname[0].toUpperCase(),
+        surname.charAt(0).toUpperCase() + surname.slice(1, 4)
+        + givenName.charAt(0).toUpperCase() + givenName.charAt(1) + '0' + number
+    ];
+}
+
+function getSearchFields(mode, $) {
+    const suffix = `> tbody > .full_table, .partial_table`;
+    switch (mode) {
+        case 'mlb': {
+            const pitching = $('#pitching_standard > tbody > .full');
+            const mlbSuffix = '> tbody > .full, .partial_table';
+            if (pitching.length == 0) {
+                return $(`#batting_standard ${mlbSuffix}`);
+            }
+            else {
+                return $(`#pitching_standard ${mlbSuffix}`);;
+            }
+        }
+        case 'nba': return $(`#per_game ${suffix}`);
+        case 'nfl': {
+            const possibleSearches = [
+                $(`#passing ${suffix}`),
+                $(`#defense ${suffix}`),
+                $(`#games_played ${suffix}`),
+                $(`#kicking ${suffix}`),
+                $(`#punting ${suffix}`),
+                $(`#receiving_and_rushing ${suffix}`),
+            ];
+            var maxSize = possibleSearches[0].length;
+            var result = possibleSearches[0];
+            for (const s of possibleSearches) {
+                if (s.length > maxSize) {
+                    maxSize = s.length;
+                    result = s;
+                }
+            }
+            if (maxSize > 0) return result;
+            throw 'not found';
+        }
+        default: throw 'Unsupported';
+    }
+}
+
+function getTeamID(mode, element) {
+    switch (mode) {
+        case 'mlb': return element.find('[data-stat=team_ID]').text().trim();
+        case 'nba': return element.find('[data-stat=team_id]').text().trim();
+        case 'nfl': {
+            const teamLink = element.find('[data-stat=team]').find('a').attr('href')
+            if (teamLink != undefined) {
+                return teamLink.slice(7, 10).trim().toUpperCase();
+            } else {
+                return 'multiple';
+            }
+        }
+        default: throw 'Unsupported';
+    }
 }
 
 function getUrl(sportName) {
@@ -22,15 +87,22 @@ export function getSportValue(mode, options) {
 }
 
 export async function searchPlayer(name, mode, browser = true) {
-    var count = 1;
+    var count = getSportValue(mode, { mlb: 1, nba: 1, nfl: 0 });
     var first = true;
     var badInput = false;
     var searchResults = [];
     const sportName = getSportValue(mode, { mlb: 'baseball', nba: 'basketball', nfl: 'pro-football' });
     const ext = getSportValue(mode, { mlb: 'shtml', nba: 'html', nfl: 'htm' });;
     while (true && count <= 15) {
-        try { //
-            const [firstLetter, nameID] = bbRefId(name, count);
+        try {
+            const [firstLetter, nameID] = getSportValue(
+                mode,
+                {
+                    mlb: bbRefId(name, count),
+                    nba: bbRefId(name, count),
+                    nfl: pfRefId(name, count)
+                }
+            );
             const playerRefUrl = `${getUrl(sportName)}/players/${firstLetter}/${nameID}.${ext}`;
             const url = `${(browser) ? 'https://cors-anywhere.herokuapp.com/' : ''}${playerRefUrl}`;
             console.log(url);
@@ -52,14 +124,7 @@ export async function searchPlayer(name, mode, browser = true) {
                 const teams = {};
                 const playerName = $('h1').text().trim();
                 const playerImgUrl = $('.media-item > img').attr('src');
-                var searchFields = $('#pitching_standard > tbody > .full, .partial_table');
-                if ($('#pitching_standard > tbody > .full').length == 0) {
-                    searchFields = getSportValue(mode, {
-                        mlb: $('#batting_standard > tbody > .full, .partial_table'),
-                        nba: $('#per_game > tbody > .full_table, .partial_table'),
-                        nfl: $('unknown')
-                    });
-                }
+                var searchFields = getSearchFields(mode, $);
                 for (const element of searchFields) {
                     var year = 0;
                     if (mode == 'mlb') {
@@ -74,17 +139,13 @@ export async function searchPlayer(name, mode, browser = true) {
                             year = NaN;
                         }
                     } else if (mode == 'nfl') {
-
+                        year = parseInt($(element).find('[data-stat=year_id]').text().trim());
                     }
                     console.log("Year", year);
                     if (year >= end) end = year;
                     if (year <= start) start = year;
-                    const team = $(element).find(`[data-stat=${getSportValue(mode, {
-                        mlb: 'team_ID',
-                        nba: 'team_id',
-                        nfl: 'unknown'
-                    })}]`).text().trim();
-                    if (team == 'TOT') continue;
+                    const team = getTeamID(mode, $(element));
+                    if (team == 'TOT' || team == 'multiple') continue;
                     if (team != prevTeam && team != 'TOT' && team.trim() != '') {
                         teamStartYear = year;
                         teamEndYear = year;

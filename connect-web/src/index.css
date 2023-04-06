@@ -92,6 +92,18 @@ code {
   background-color: blue;
 }
 
+.nflGames {
+  background-color: aquamarine;
+}
+
+.nflGames button {
+  background-color: cornflowerblue;
+}
+
+.nflGames button:hover {
+  background-color: darkblue;
+}
+
 .customGames {
   background-color: floralwhite;
 }

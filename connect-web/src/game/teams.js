@@ -2,23 +2,32 @@ import sample from '@stdlib/random-sample';
 import { getSportValue } from './search';
 
 export const MLBTEAMS = [
-    'ARI', 'ATL', 'BAL', 'BOS', 'CHC', 'CHW',
-    'CIN', 'CLE', 'COL', 'DET', 'HOU', 'KCR',
-    'LAA', 'LAD', 'MIA', 'MIL', 'MIN', 'NYM',
-    'NYY', 'OAK', 'PHI', 'PIT', 'SDP', 'SEA',
-    'SFG', 'STL', 'TBR', 'TEX', 'TOR', 'WSN'
+    'ATL', 'NYM', 'WSN', 'PHI', 'MIA', // nl east
+    'CHC', 'CIN', 'PIT', 'MIL', 'STL', // nl central
+    'LAD', 'SDP', 'SFG', 'ARI', 'COL', // nl west
+    'NYY', 'TOR', 'TBR', 'BOS', 'BAL', // al east
+    'MIN', 'CLE', 'CHW', 'DET', 'KCR', // al central
+    'HOU', 'LAA', 'SEA', 'TEX', 'OAK' // al west
 ]; // Based on names of logos
 
 export const NBATEAMS = [
-    'ATL', 'BOS', 'BRK', 'CHI', 'CHO', 'CLE',
-    'DAL', 'DEN', 'DET', 'GSW', 'HOU', 'IND',
-    'LAC', 'LAL', 'MEM', 'MIA', 'MIL', 'MIN',
-    'NOP', 'NYK', 'OKC', 'ORL', 'PHI', 'PHO',
-    'POR', 'SAC', 'SAS', 'TOR', 'UTA', 'WAS'
+    'BOS', 'NYK', 'PHI', 'BRK', 'TOR', // atlantic
+    'MIL', 'DET', 'CHI', 'CLE', 'IND', // central
+    'ATL', 'MIA', 'WAS', 'CHO', 'ORL', // southeast
+    'NOP', 'DAL', 'SAS', 'HOU', 'MEM', // southwest
+    'MIN', 'DEN', 'OKC', 'UTA', 'POR', // northwest
+    'LAL', 'GSW', 'PHO', 'SAC', 'LAC' // pacific
 ]; // Based on names of logos
 
 export const NFLTEAMS = [
-
+    'NYG', 'DAL', 'PHI', 'WAS', // nfc east
+    'GNB', 'DET', 'MIN', 'CHI', // nfc north
+    'ATL', 'NOR', 'CAR', 'TAM', // nfc south
+    'SEA', 'RAM', 'CRD', 'SFO', // nfc west
+    'NWE', 'NYJ', 'MIA', 'BUF', // afc east
+    'PIT', 'CIN', 'CLE', 'RAV', // afc north
+    'CLT', 'HTX', 'OTI', 'JAX', // afc south
+    'DEN', 'KAN', 'RAI', 'SDG' // afc west
 ]; // Based on names of logos
 
 export function randomTeams(length, mode) {
@@ -86,6 +95,14 @@ export function checkTeamRenameNBA(gameTeamCode) {
     }
 }
 
+export function checkTeamRenameNFL(gameTeamCode) {
+    switch (gameTeamCode) {
+        case 'CLT': return new Set(['BAL', gameTeamCode, 'IND']);
+        case 'SDG': return new Set(['LAC', gameTeamCode]);
+        default: return new Set([gameTeamCode]);
+    }
+}
+
 export function getMatrix(rowTeams, colTeams) {
     const board = {};
     for (var i = 0; i < rowTeams.length; i++) {
@@ -101,12 +118,12 @@ export function checkPlayerTeams(teams, playerTeams, mode) {
     const otherNames1 = getSportValue(mode, {
         mlb: checkTeamRenameMLB(team1),
         nba: checkTeamRenameNBA(team1),
-        nfl: 'unknown'
+        nfl: checkTeamRenameNFL(team1),
     });
     const otherNames2 = getSportValue(mode, {
         mlb: checkTeamRenameMLB(team2),
         nba: checkTeamRenameNBA(team2),
-        nfl: 'unknown'
+        nfl: checkTeamRenameNFL(team2),
     });
     var team1Check = false;
     var team2Check = false;

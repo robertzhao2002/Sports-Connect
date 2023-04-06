@@ -1,5 +1,5 @@
 import { batch, createSignal, Show } from "solid-js";
-import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge } from "./game/Modes";
+import { MLBMini, MLBMedium, MLBLarge, NBAMini, NBAMedium, NBALarge, NFLMini, NFLMedium, NFLLarge } from "./game/Modes";
 import { pastGuesses, PastGuesses } from "./game/History";
 import { CustomGame, CurrentCustomGameState, setCustomGameState, resetCustomGame } from "./game/Custom";
 
@@ -15,6 +15,11 @@ const State = {
     Mini: "NBAMini",
     Medium: "NBAMedium",
     Large: "NBALarge"
+  },
+  NFL: {
+    Mini: "NFLMini",
+    Medium: "NFLMedium",
+    Large: "NFLLarge"
   },
   Custom: {
     Board: "CustomBoard",
@@ -65,6 +70,27 @@ function startNBALarge(event) {
   });
 }
 
+function startNFLMini(event) {
+  event.preventDefault();
+  batch(() => {
+    setGameState({ state: State.NFL.Mini })
+  });
+}
+
+function startNFLMedium(event) {
+  event.preventDefault();
+  batch(() => {
+    setGameState({ state: State.NFL.Medium })
+  });
+}
+
+function startNFLLarge(event) {
+  event.preventDefault();
+  batch(() => {
+    setGameState({ state: State.NFL.Large })
+  });
+}
+
 function startSelectingTeams(event) {
   event.preventDefault();
   batch(() => {
@@ -86,6 +112,8 @@ function App() {
   console.log(gameState());
   return (
     <div class="gameContainer">
+
+      {/* MLB Modes */}
       <Show
         when={gameState().state == State.MLB.Mini}>
         <div class="gameContainer">
@@ -107,6 +135,8 @@ function App() {
           <MLBLarge />
         </div>
       </Show>
+
+      {/* NBA Modes */}
       <Show
         when={gameState().state == State.NBA.Mini}>
         <div class="gameContainer">
@@ -126,6 +156,29 @@ function App() {
         <div class="gameContainer">
           <button class="backButton" onClick={back}>Back</button>
           <NBALarge />
+        </div>
+      </Show>
+
+      {/* NFL Modes */}
+      <Show
+        when={gameState().state == State.NFL.Mini}>
+        <div class="gameContainer">
+          <button class="backButton" onClick={back}>Back</button>
+          <NFLMini />
+        </div>
+      </Show>
+      <Show
+        when={gameState().state == State.NFL.Medium}>
+        <div class="gameContainer">
+          <button class="backButton" onClick={back}>Back</button>
+          <NFLMedium />
+        </div>
+      </Show>
+      <Show
+        when={gameState().state == State.NFL.Large}>
+        <div class="gameContainer">
+          <button class="backButton" onClick={back}>Back</button>
+          <NFLLarge />
         </div>
       </Show>
       <Show
@@ -166,6 +219,21 @@ function App() {
               <img height="20px" width="20px" src="/pictures/nba.png" />
               <img height="20px" width="20px" src="/pictures/nba.png" />
               <img height="20px" width="20px" src="/pictures/nba.png" />
+            </button>
+          </div>
+          <div class="nflGames menuCard">
+            <h2>NFL Mode</h2>
+            <button onClick={startNFLMini}>
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
+            </button>
+            <button onClick={startNFLMedium}>
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
+            </button>
+            <button onClick={startNFLLarge}>
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
+              <img height="20px" width="20px" src="/pictures/nfl.png" />
             </button>
           </div>
           <div class="customGames menuCard">

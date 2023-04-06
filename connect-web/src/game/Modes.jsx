@@ -25,13 +25,13 @@ export function MLBLarge() {
 }
 
 export function NFLMini() {
-
+    return ConnectGame('nfl', 1);
 }
 
 export function NFLMedium() {
-
+    return ConnectGame('nfl', 2);
 }
 
 export function NFLLarge() {
-
+    return ConnectGame('nfl', 3);
 }

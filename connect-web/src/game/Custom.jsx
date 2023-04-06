@@ -1,5 +1,5 @@
 import '../index.css';
-import { MLBTEAMS, NBATEAMS } from './teams';
+import { MLBTEAMS, NBATEAMS, NFLTEAMS } from './teams';
 import { createSignal, Show } from "solid-js";
 import { createGrid, ConnectGame } from './Game';
 
@@ -37,10 +37,11 @@ function addTeam(team) {
 }
 
 function Teams(teams, sport) {
+    const size = (sport == 'nfl') ? "80px" : "60px";
     return (<div align="center">
         <For each={teams}>{team =>
             <div class={(teamsSelected().includes(team)) ? "customImg-disabled" : "customImg"}>
-                <img src={`/team-logos/${sport}/${team}.png`} height="40px" width="40px" onClick={() =>
+                <img src={`/team-logos/${sport}/${team}.png`} height={size} width={size} onClick={() =>
                     addTeam(team)} />
             </div>
         }</For>
@@ -68,16 +69,24 @@ function NBATeams() {
     return Teams(NBATEAMS, 'nba');
 }
 
+function NFLTeams() {
+    return Teams(NFLTEAMS, 'nfl');
+}
+
 function SelectTeams() {
     return (<div align="center">
         <h1>Pick Your Teams!</h1>
         <button style={`background-color: ${(sportSignal() == "mlb") ? "darkorchid" : "beige"}`} onClick={() => changeMode("mlb")}>MLB</button>
         <button style={`background-color: ${(sportSignal() == "nba") ? "darkorchid" : "beige"}`} onClick={() => changeMode("nba")}>NBA</button>
+        <button style={`background-color: ${(sportSignal() == "nfl") ? "darkorchid" : "beige"}`} onClick={() => changeMode("nfl")}>NFL</button>
         <Show when={sportSignal() == "mlb"}>
             <MLBTeams />
         </Show>
         <Show when={sportSignal() == "nba"}>
             <NBATeams />
+        </Show>
+        <Show when={sportSignal() == "nfl"}>
+            <NFLTeams />
         </Show>
         <div>
             <button style={`background-color: ${(rowMode()) ? "cadetblue" : "beige"}`} onClick={() => setRowMode(true)}>Row Teams</button>

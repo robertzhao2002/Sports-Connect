@@ -41,6 +41,7 @@ function getSearchFields(mode, $) {
                 $(`#kicking ${suffix}`),
                 $(`#punting ${suffix}`),
                 $(`#receiving_and_rushing ${suffix}`),
+                $(`#rushing_and_receiving ${suffix}`),
             ];
             var maxSize = possibleSearches[0].length;
             var result = possibleSearches[0];
@@ -51,7 +52,7 @@ function getSearchFields(mode, $) {
                 }
             }
             if (maxSize > 0) return result;
-            throw 'not found';
+            else return {};
         }
         default: throw 'Unsupported';
     }
@@ -74,7 +75,7 @@ function getTeamID(mode, element) {
 }
 
 function getUrl(sportName) {
-    return `https://www.${sportName}-reference.com/`;
+    return `https://www.${sportName}-reference.com`;
 }
 
 export function getSportValue(mode, options) {
@@ -176,6 +177,7 @@ export async function searchPlayer(name, mode, browser = true) {
             }
         } catch (error) {
             console.log(error);
+            return;
         }
     }
 

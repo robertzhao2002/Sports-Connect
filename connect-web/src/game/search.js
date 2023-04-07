@@ -126,45 +126,58 @@ export async function searchPlayer(name, mode, browser = true) {
                 const playerName = $('h1').text().trim();
                 const playerImgUrl = $('.media-item > img').attr('src');
                 var searchFields = getSearchFields(mode, $);
-                for (const element of searchFields) {
-                    var year = 0;
-                    if (mode == 'mlb') {
-                        year = parseInt($(element).find('[data-stat=year_ID]').text().trim());
-                    } else if (mode == 'nba') {
-                        const idValue = $(element).attr('id');
-                        if (idValue != undefined) {
-                            year = parseInt(idValue.slice(-4).trim());
-                            if (year < end) break;
+                console.log(Object.keys(searchFields));
+                if (Object.keys(searchFields) != 0) {
+                    for (const element of searchFields) {
+                        var year = 0;
+                        if (mode == 'mlb') {
+                            year = parseInt($(element).find('[data-stat=year_ID]').text().trim());
+                        } else if (mode == 'nba') {
+                            console.log('nba');
+                            const idValue = $(element).attr('id');
+                            if (idValue != undefined) {
+                                year = parseInt(idValue.slice(-4).trim());
+                                if (year < end) break;
+                            }
+                            else {
+                                year = NaN;
+                            }
+                        } else if (mode == 'nfl') {
+                            console.log('nfl');
+                            year = parseInt($(element).find('[data-stat=year_id]').text().trim());
+                            console.log("parsed year", year);
+                            if (isNaN(year)) {
+                                console.log('year is not a number');
+                                year = teamEndYear;
+                            }
                         }
-                        else {
-                            year = NaN;
+                        console.log("Year", year);
+                        if (year >= end) end = year;
+                        if (year <= start) start = year;
+                        const team = getTeamID(mode, $(element));
+                        if (team == 'TOT' || team == 'multiple') {
+                            if (team == 'multiple') teamEndYear = year;
+                            continue;
                         }
-                    } else if (mode == 'nfl') {
-                        year = parseInt($(element).find('[data-stat=year_id]').text().trim());
-                    }
-                    console.log("Year", year);
-                    if (year >= end) end = year;
-                    if (year <= start) start = year;
-                    const team = getTeamID(mode, $(element));
-                    if (team == 'TOT' || team == 'multiple') continue;
-                    if (team != prevTeam && team != 'TOT' && team.trim() != '') {
-                        teamStartYear = year;
-                        teamEndYear = year;
-                        if (team in teams) {
-                            const a = { start: teamStartYear, end: teamEndYear };
-                            if (!teams[team].find(s => a.start == a.start && s.end == a.end))
-                                teams[team].push(a);
+                        if (team != prevTeam && team != 'TOT' && team.trim() != '') {
+                            teamStartYear = year;
+                            teamEndYear = year;
+                            if (team in teams) {
+                                const a = { start: teamStartYear, end: teamEndYear };
+                                if (!teams[team].find(s => a.start == a.start && s.end == a.end))
+                                    teams[team].push(a);
+                            }
+                            else {
+                                teams[team] = [{ start: teamStartYear, end: teamEndYear }];
+                            }
                         }
-                        else {
-                            teams[team] = [{ start: teamStartYear, end: teamEndYear }];
+                        if (team != 'TOT' && team.trim() != '') {
+                            const stints = teams[team].length;
+                            teams[team][stints - 1].end = year;
                         }
-                    }
-                    if (team != 'TOT' && team.trim() != '') {
-                        const stints = teams[team].length;
-                        teams[team][stints - 1].end = year;
-                    }
-                    prevTeam = team;
-                };
+                        prevTeam = team;
+                    };
+                }
                 count++;
                 console.log(teams);
                 searchResults.push({

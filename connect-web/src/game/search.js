@@ -199,14 +199,11 @@ export async function searchPlayer(name, mode, browser = true) {
     return searchResults;
 }
 
-function getBest2(body, firstTeam, secondTeam, pitcher) {
+function getBest2(body, firstTeam, secondTeam, idKey, statKey1, statKey2, sport) {
     const unknown = { playerName: 'unknown', playerStat: 0, url: 'unknown' };
     const bestTwo = { [firstTeam]: unknown, [secondTeam]: unknown };
     const $ = cheerio.load(body);
-    const idKey = pitcher ? 'pitch_stats' : 'bat_stats';
     $(`#${idKey} > tbody > tr`).map((_, element) => {
-        const statKey1 = pitcher ? `${firstTeam}_IP` : `${firstTeam}_HR`
-        const statKey2 = pitcher ? `${secondTeam}_IP` : `${secondTeam}_HR`
         const name = $(element).find('th > a').text().trim();
         const urlSuffix = $(element).find('th > a').attr("href");
         const statRaw1 = $(element).find(`td[data-stat=${statKey1}]`).text().trim();
@@ -214,50 +211,98 @@ function getBest2(body, firstTeam, secondTeam, pitcher) {
         const stat1 = (statRaw1.length == 0) ? 0 : parseFloat(statRaw1);
         const stat2 = (statRaw2.length == 0) ? 0 : parseFloat(statRaw2);
         if (stat1 >= bestTwo[firstTeam].playerStat) bestTwo[firstTeam] = {
-            playerName: name, playerStat: stat1, url: `${getUrl("baseball")}${urlSuffix}`
+            playerName: name, playerStat: stat1, url: `${getUrl(sport)}${urlSuffix}`
         };
         if (stat2 >= bestTwo[secondTeam].playerStat) bestTwo[secondTeam] = {
-            playerName: name, playerStat: stat2, url: `${getUrl("baseball")}${urlSuffix}`
+            playerName: name, playerStat: stat2, url: `${getUrl(sport)}${urlSuffix}`
         };
     });
     return bestTwo;
 }
 
-export async function getHint(teamPair, inGame = false) {
-    const firstTeam = teamID(teamPair[0]);
-    const secondTeam = teamID(teamPair[1]);
-    const url = `https://cors-anywhere.herokuapp.com/${getUrl("baseball")}/friv/multifranchise.cgi?level=franch&t1=${firstTeam}&t2=${secondTeam}`
+function getBest2Mlb(body, firstTeam, secondTeam, pitcher) {
+    return getBest2(
+        body,
+        firstTeam,
+        secondTeam,
+        pitcher ? 'pitch_stats' : 'bat_stats',
+        pitcher ? `${firstTeam}_IP` : `${firstTeam}_HR`,
+        pitcher ? `${secondTeam}_IP` : `${secondTeam}_HR`,
+        "baseball"
+    );
+}
+
+function getBest2Nba(body, firstTeam, secondTeam) {
+    return getBest2(
+        body,
+        firstTeam,
+        secondTeam,
+        "multifranchise_stats_0",
+        `${firstTeam}_games`,
+        `${secondTeam}_games`,
+        "basketball"
+    );
+}
+
+export async function getHint(teamPair, inGame, mode) {
+    const firstTeam = teamID(teamPair[0], mode);
+    const secondTeam = teamID(teamPair[1], mode);
+    console.log(firstTeam, secondTeam)
+    const url = `https://cors-anywhere.herokuapp.com/${getUrl(
+        getSportValue(mode, {
+            mlb: 'baseball',
+            nba: 'basketball',
+            nfl: 'football'
+        })
+    )
+        }/friv/${getSportValue(mode, {
+            mlb: 'multifranchise',
+            nba: 'players-who-played-for-multiple-teams-franchises',
+            nfl: 'multifranchise'
+        })}.${getSportValue(mode, {
+            mlb: 'cgi',
+            nba: 'fcgi',
+            nfl: 'cgi'
+        })}?level=franch&t1=${firstTeam}&t2=${secondTeam}`
     const response = await fetch(url);
     console.log(response.status);
     if (response.status == 200) {
         const body = await response.text();
-        const bestTwoHitters = Object.values(
-            getBest2(body, firstTeam, secondTeam, false)
+        const bestTwo = Object.values(
+            getSportValue(mode, {
+                mlb: getBest2Mlb(body, firstTeam, secondTeam, false),
+                nba: getBest2Nba(body, firstTeam, secondTeam),
+                nfl: "Coming Soon"
+            })
         ).map(p => `${p.playerName}..${p.url}`);
         if (!inGame) {
-            const bestTwoPitchers = Object.values(
-                getBest2(body, firstTeam, secondTeam, true)
-            ).map(p => `${p.playerName}..${p.url}`);
-            return {
-                hitters: bestTwoHitters,
-                pitchers: bestTwoPitchers
-            };
+            return getSportValue(mode, {
+                mlb: {
+                    hitters: bestTwo,
+                    pitchers: Object.values(
+                        getBest2Mlb(body, firstTeam, secondTeam, true)
+                    ).map(p => `${p.playerName}..${p.url}`)
+                },
+                nba: bestTwo,
+                nfl: "Coming Soon"
+            });
         } else {
-            return bestTwoHitters[0];
+            console.log(bestTwo);
+            return bestTwo[0];
         }
     }
     return null;
 }
 
-export async function possibleSolution(teams) {
+export async function possibleSolution(teams, mode) {
+    console.log("searching...");
     const solution = {};
     for (var i = 0; i < teams.length; i++) {
         const teamPair = teams[i].split(',');
-        const teamPairQuery = [teamID(teamPair[0]), teamID(teamPair[1])];
-        solution[teamPair] = { hitters: null, pitchers: null };
-        const solutionObj = await getHint(teamPairQuery)
-        solution[teamPair].hitters = solutionObj.hitters;
-        solution[teamPair].pitchers = solutionObj.pitchers;
+        const teamPairQuery = [teamID(teamPair[0], mode), teamID(teamPair[1], mode)];
+        solution[teamPair] = getSportValue(mode, { mlb: { hitters: null, pitchers: null }, nba: null });
+        const solutionObj = await getHint(teamPairQuery, false, mode)
+        solution[teamPair] = solutionObj;
     }
     return solution;
 }

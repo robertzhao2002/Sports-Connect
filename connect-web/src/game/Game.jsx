@@ -64,6 +64,7 @@ function gameCopy(g) {
 }
 
 export function ConnectGame(mode, length, customTeams = null, customMode = false) {
+    console.log(mode);
     const maxScore = (customTeams == null) ? length * length : customTeams[0].length * customTeams[1].length;
     const game = (customTeams == null) ? createRandomGame(mode, length) : createGame(customTeams[0], customTeams[1]);
     const [gameSignal, setGameSignal] = createSignal(game);
@@ -141,7 +142,7 @@ export function ConnectGame(mode, length, customTeams = null, customMode = false
             for (const e of Object.entries(gameSignal().board)) {
                 const [teams, answer] = e;
                 if (answer.player == null) {
-                    getHint(teams.split(','), true).then(function (result) {
+                    getHint(teams.split(','), true, mode).then(function (result) {
                         setIsLoading(false);
                         alert(result.split('..')[0]);
                     });
@@ -156,7 +157,7 @@ export function ConnectGame(mode, length, customTeams = null, customMode = false
         batch(() => {
             console.log("solving...");
             setIsLoading(true);
-            possibleSolution(Object.keys(gameSignal().board)).then(function (result) {
+            possibleSolution(Object.keys(gameSignal().board), mode).then(function (result) {
                 setIsLoading(false);
                 console.log(result);
                 gameSignal().solution = result;
@@ -183,24 +184,39 @@ export function ConnectGame(mode, length, customTeams = null, customMode = false
                             <div class="solutionPair">
                                 <img src={`/team-logos/${mode}/${teams.split(',')[0]}.png`} height="50" width="50" />
                                 <img src={`/team-logos/${mode}/${teams.split(',')[1]}.png`} height="50" width="50" />
-                                <h1>Hitters</h1>
-                                <span>
-                                    <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
-                                        const [name, url] = solutionString.split('..');
-                                        return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                                    }}
-                                    </For>
-                                </span>
-                                <br />
-                                <h1>Pitchers</h1>
-                                <span>
-                                    <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
-                                        const [name, url] = solutionString.split('..');
-                                        return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
-                                    }}
-                                    </For>
-                                </span>
-                                <br />
+
+                                <Show
+                                    when={mode == "mlb"}>
+                                    <h1>Hitters</h1>
+                                    <span>
+                                        <For each={Array.from(gameSignal().solution[teams].hitters)}>{solutionString => {
+                                            const [name, url] = solutionString.split('..');
+                                            return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                        }}
+                                        </For>
+                                    </span>
+                                    <br />
+                                    <h1>Pitchers</h1>
+                                    <span>
+                                        <For each={Array.from(gameSignal().solution[teams].pitchers)}>{solutionString => {
+                                            const [name, url] = solutionString.split('..');
+                                            return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                        }}
+                                        </For>
+                                    </span>
+                                    <br />
+                                </Show>
+                                <Show
+                                    when={mode == "nba"}>
+                                    <span>
+                                        <For each={Array.from(gameSignal().solution[teams])}>{solutionString => {
+                                            const [name, url] = solutionString.split('..');
+                                            return (<a href={url} target="_blank" class="buttonLink">{name}</a>);
+                                        }}
+                                        </For>
+                                    </span>
+                                    <br />
+                                </Show>
                             </div>
                         }
                         </For>
@@ -248,7 +264,7 @@ export function ConnectGame(mode, length, customTeams = null, customMode = false
                     </Show>
                     <button onClick={newGame} id="newGame">New {(customMode) ? "Custom Game " : ""}🔀</button>
                     <Show
-                        when={mode == 'mlb' && gameSignal().solution == null && gameSignal().score != maxScore}>
+                        when={(mode == 'mlb' || mode == 'nba') && gameSignal().solution == null && gameSignal().score != maxScore}>
 
                         <button onClick={hint} id="hintButton">Hint 💡</button>
                         <button onClick={solve} id="solveButton">Solve ⭐</button>

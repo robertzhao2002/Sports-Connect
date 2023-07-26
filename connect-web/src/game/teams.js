@@ -62,13 +62,25 @@ export function checkTeamRenameMLB(gameTeamCode) {
     }
 }
 
-export function teamID(gameTeamCode) {
-    switch (gameTeamCode) {
-        case 'MIA': return 'FLA';
-        case 'LAA': return 'ANA';
-        case 'TBR': return 'TBD';
-        default: return gameTeamCode;
+export function teamID(gameTeamCode, mode) {
+    if (mode == "mlb") {
+        switch (gameTeamCode) {
+            case 'MIA': return 'FLA';
+            case 'LAA': return 'ANA';
+            case 'TBR': return 'TBD';
+            default: return gameTeamCode;
+        }
+    } else if (mode == "nba") {
+        switch (gameTeamCode) {
+            case 'NOP': return 'NOH';
+            case 'CHO': return 'CHA';
+            case 'BRK': return 'NJN';
+            default: return gameTeamCode;
+        }
+    } else {
+        return null;
     }
+
 }
 
 export function checkTeamRenameNBA(gameTeamCode) {

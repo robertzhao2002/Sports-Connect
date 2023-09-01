@@ -225,9 +225,9 @@ function getBest2Mlb(body, firstTeam, secondTeam, pitcher) {
         body,
         firstTeam,
         secondTeam,
-        pitcher ? 'pitch_stats' : 'bat_stats',
-        pitcher ? `${firstTeam}_IP` : `${firstTeam}_HR`,
-        pitcher ? `${secondTeam}_IP` : `${secondTeam}_HR`,
+        pitcher ? 'multifranchise_stats_1' : 'multifranchise_stats_0',
+        pitcher ? `${firstTeam}_p_ip` : `${firstTeam}_b_hr`,
+        pitcher ? `${secondTeam}_p_ip` : `${secondTeam}_b_hr`,
         "baseball"
     );
 }
@@ -256,14 +256,15 @@ export async function getHint(teamPair, inGame, mode) {
         })
     )
         }/friv/${getSportValue(mode, {
-            mlb: 'multifranchise',
+            mlb: 'players-who-played-for-multiple-teams-franchises',
             nba: 'players-who-played-for-multiple-teams-franchises',
             nfl: 'multifranchise'
         })}.${getSportValue(mode, {
-            mlb: 'cgi',
+            mlb: 'fcgi',
             nba: 'fcgi',
             nfl: 'cgi'
         })}?level=franch&t1=${firstTeam}&t2=${secondTeam}`
+    console.log(url);
     const response = await fetch(url);
     console.log(response.status);
     if (response.status == 200) {

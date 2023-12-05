@@ -1,6 +1,7 @@
 import random, pprint
 from teams import TEAM_CODES, name_changes_mlb
 from search import search_player, suggest_single_solution, possible_solution
+import secrets
 
 pp = pprint.PrettyPrinter(indent=4)
 TEAMS = TEAM_CODES
@@ -8,7 +9,7 @@ side_length = int(input("Enter the number of teams you want on one side of the s
 random = True if input("Random teams or custom? ").strip().lower() == 'random' else False
 teams = []
 if random:
-    teams = random.sample(TEAMS, side_length * 2)
+    teams = secrets.SystemRandom().sample(TEAMS, side_length * 2)
 else:
     for i in range(side_length):
         teams.append(input("Enter Row Team {}: ".format(str(i+1))).strip().upper())
